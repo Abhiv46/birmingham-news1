@@ -1,8 +1,14 @@
-# Bham News Website
+# System files
 .DS_Store
 Thumbs.db
-.vercel/
-*.log
-node_modules/
+desktop.ini
+
+# Environment files
 .env
 secrets.json
+
+# Logs
+*.log
+
+# Vercel
+.vercel/
