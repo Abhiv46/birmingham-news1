@@ -3,20 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bham Pulse | Live Birmingham News (100 Requests/Day Optimized)</title>
-    <meta name="description" content="Live Birmingham news, weather, sports - Optimized for NewsAPI's 100 requests/day limit with smart caching">
-    <meta name="keywords" content="Birmingham news, West Midlands, UK news, breaking news, local news, free news API">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <title>Bham Pulse | Live Birmingham News</title>
+    <meta name="description" content="Live Birmingham news, weather, sports and breaking updates from West Midlands">
+    <meta name="keywords" content="Birmingham news, West Midlands, UK news, breaking news, local news">
     
     <!-- CSS -->
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- AdSense (Future ke liye) -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YourIDHere" crossorigin="anonymous"></script>
 </head>
 <body>
     <!-- Header -->
@@ -27,9 +21,6 @@
                 <h1>Bham<span>Pulse</span></h1>
                 <div class="live-badge">
                     <span class="dot"></span> LIVE
-                    <span class="cache-badge" title="Smart 10-min cache active">
-                        <i class="fas fa-bolt"></i> OPTIMIZED
-                    </span>
                 </div>
             </div>
             
@@ -39,17 +30,9 @@
                 <a href="#sports" class="nav-link"><i class="fas fa-futbol"></i> Sports</a>
                 <a href="#business" class="nav-link"><i class="fas fa-chart-line"></i> Business</a>
                 <a href="#weather" class="nav-link"><i class="fas fa-cloud-sun"></i> Weather</a>
-                <a href="#saved" class="nav-link"><i class="fas fa-bookmark"></i> Saved</a>
             </nav>
             
             <div class="header-controls">
-                <div class="api-usage-mini">
-                    <span class="usage-label">API:</span>
-                    <span class="usage-count" id="miniApiCount">0/100</span>
-                    <div class="usage-bar-mini">
-                        <div class="usage-fill-mini" id="miniUsageFill" style="width: 0%"></div>
-                    </div>
-                </div>
                 <div class="search-container">
                     <input type="text" id="searchInput" placeholder="Search news...">
                     <button id="searchBtn"><i class="fas fa-search"></i></button>
@@ -67,12 +50,8 @@
             <span class="breaking-label"><i class="fas fa-bolt"></i> BREAKING</span>
             <div class="ticker-container">
                 <marquee behavior="scroll" direction="left" id="newsTicker">
-                    Loading breaking news... | Smart caching active: 10-minute cache for API limit optimization
+                    Loading breaking news...
                 </marquee>
-            </div>
-            <div class="cache-status">
-                <i class="fas fa-database"></i>
-                <span id="cacheStatus">Cache: Ready</span>
             </div>
         </div>
     </div>
@@ -82,30 +61,23 @@
         <!-- Hero Section -->
         <section class="hero" id="home">
             <div class="hero-text">
-                <h2>Birmingham's Smart News Hub</h2>
-                <p>Real-time updates with intelligent caching to stay within 100 API requests/day limit</p>
+                <h2>Birmingham's Live News Hub</h2>
+                <p>Real-time updates, weather, sports & local events from across West Midlands</p>
                 <div class="hero-stats">
                     <div class="stat">
                         <i class="fas fa-sync-alt"></i>
-                        <span>Auto-refresh every <strong>30 minutes</strong></span>
-                        <small>(API limit optimized)</small>
+                        <span>Auto-updates every <strong>15 minutes</strong></span>
                     </div>
                     <div class="stat">
-                        <i class="fas fa-database"></i>
-                        <span>Smart <strong>10-minute cache</strong></span>
-                        <small>(Saves API calls)</small>
-                    </div>
-                    <div class="stat">
-                        <i class="fas fa-users"></i>
-                        <span><strong>1000+ visitors/day</strong> supported</span>
-                        <small>(Within free limit)</small>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Covering <strong>Birmingham & West Midlands</strong></span>
                     </div>
                 </div>
             </div>
             <div class="weather-widget" id="weatherWidget">
                 <div class="weather-header">
                     <h3><i class="fas fa-cloud-sun"></i> Birmingham</h3>
-                    <span class="update-time" id="weatherTime">Updating...</span>
+                    <span class="update-time" id="weatherTime">Updated: Just now</span>
                 </div>
                 <div class="weather-content">
                     <div class="temp-main">14°C</div>
@@ -115,125 +87,43 @@
                         <div><i class="fas fa-tint"></i> 65%</div>
                     </div>
                 </div>
-                <div class="cache-info">
-                    <i class="fas fa-info-circle"></i>
-                    <span>Weather updates every 30min</span>
-                </div>
             </div>
         </section>
 
-        <!-- API Usage Dashboard (New) -->
-        <div class="api-dashboard">
-            <div class="dashboard-card">
-                <h4><i class="fas fa-chart-line"></i> API Usage Today</h4>
-                <div class="dashboard-content">
-                    <div class="usage-meter">
-                        <div class="meter-labels">
-                            <span>Free Plan: 100 requests/day</span>
-                            <span id="dailyCount">0/100</span>
-                        </div>
-                        <div class="meter-bar-large">
-                            <div class="meter-fill-large" id="meterFillLarge" style="width: 0%"></div>
-                        </div>
-                        <div class="meter-details">
-                            <div class="detail">
-                                <span class="detail-label">Used:</span>
-                                <span class="detail-value" id="usedCount">0</span>
-                            </div>
-                            <div class="detail">
-                                <span class="detail-label">Remaining:</span>
-                                <span class="detail-value" id="remainingCount">100</span>
-                            </div>
-                            <div class="detail">
-                                <span class="detail-label">Resets:</span>
-                                <span class="detail-value" id="resetTime">Midnight</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="usage-tips">
-                        <h5><i class="fas fa-lightbulb"></i> Optimization Tips</h5>
-                        <ul>
-                            <li>• 10-minute cache reduces API calls by 80%</li>
-                            <li>• 30-minute auto-refresh saves requests</li>
-                            <li>• 2-minute cooldown on manual refresh</li>
-                            <li>• All visitors share cached data</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- News Categories Tabs -->
         <div class="category-tabs" id="categoryTabs">
-            <button class="tab-btn active" data-category="general">
-                <i class="fas fa-star"></i> Top Stories
-                <span class="tab-cache" title="Cached for 10 minutes">🔄</span>
-            </button>
-            <button class="tab-btn" data-category="business">
-                <i class="fas fa-chart-line"></i> Business
-                <span class="tab-cache" title="Will cache on first click">⏳</span>
-            </button>
-            <button class="tab-btn" data-category="sports">
-                <i class="fas fa-futbol"></i> Sports
-                <span class="tab-cache" title="Will cache on first click">⏳</span>
-            </button>
-            <button class="tab-btn" data-category="technology">
-                <i class="fas fa-laptop-code"></i> Tech
-                <span class="tab-cache" title="Will cache on first click">⏳</span>
-            </button>
-            <button class="tab-btn" data-category="entertainment">
-                <i class="fas fa-film"></i> Entertainment
-                <span class="tab-cache" title="Will cache on first click">⏳</span>
-            </button>
-            <button class="tab-btn" data-category="health">
-                <i class="fas fa-heartbeat"></i> Health
-                <span class="tab-cache" title="Will cache on first click">⏳</span>
-            </button>
+            <button class="tab-btn active" data-category="general">Top Stories</button>
+            <button class="tab-btn" data-category="business">Business</button>
+            <button class="tab-btn" data-category="sports">Sports</button>
+            <button class="tab-btn" data-category="entertainment">Entertainment</button>
+            <button class="tab-btn" data-category="technology">Technology</button>
+            <button class="tab-btn" data-category="health">Health</button>
         </div>
 
         <!-- News Grid -->
         <section class="news-section">
             <div class="section-header">
-                <div class="section-title">
-                    <h3><i class="fas fa-newspaper"></i> Latest News</h3>
-                    <div class="cache-indicator" id="cacheIndicator">
-                        <i class="fas fa-database"></i>
-                        <span>Loading from cache...</span>
-                    </div>
-                </div>
+                <h3><i class="fas fa-newspaper"></i> Latest News</h3>
                 <div class="controls">
-                    <button class="refresh-btn" id="refreshBtn" title="2-minute cooldown between refreshes">
-                        <i class="fas fa-redo"></i> 
-                        <span class="btn-text">Refresh</span>
-                        <span class="cooldown-timer" id="cooldownTimer"></span>
+                    <button class="refresh-btn" id="refreshBtn">
+                        <i class="fas fa-redo"></i> Refresh
                     </button>
-                    <div class="update-info">
-                        <span class="last-update" id="lastUpdate">Last: Just now</span>
-                        <span class="cache-info-small" id="cacheSource">
-                            <i class="fas fa-bolt"></i> Smart Cache
-                        </span>
-                    </div>
+                    <span class="last-update" id="lastUpdate">Just now</span>
                 </div>
             </div>
 
             <div class="news-container" id="newsContainer">
-                <!-- News cards yaha load honge -->
                 <div class="loading-spinner">
                     <i class="fas fa-spinner fa-spin"></i>
-                    <p>Loading latest news with smart caching...</p>
-                    <small>First load may take 2-3 seconds</small>
+                    <p>Loading latest news...</p>
                 </div>
             </div>
 
             <!-- Load More Button -->
             <div class="load-more-container">
                 <button class="load-more-btn" id="loadMoreBtn">
-                    <i class="fas fa-plus"></i> Load More News (API Free)
+                    <i class="fas fa-plus"></i> Load More News
                 </button>
-                <p class="load-more-note">
-                    <i class="fas fa-info-circle"></i>
-                    Loading more articles uses the same cached data - no extra API calls!
-                </p>
             </div>
         </section>
 
@@ -255,68 +145,67 @@
         <aside class="sidebar">
             <!-- Trending Now -->
             <div class="sidebar-widget trending-widget">
-                <div class="widget-header">
-                    <h4><i class="fas fa-fire"></i> Trending Now</h4>
-                    <span class="widget-cache" title="Cached for 10 minutes">
-                        <i class="fas fa-bolt"></i> Cached
-                    </span>
-                </div>
+                <h4><i class="fas fa-fire"></i> Trending Now</h4>
                 <div class="trending-list" id="trendingList">
-                    <!-- Trending topics yaha aayenge -->
-                    <div class="trending-placeholder">
-                        <p>Trending news will load here...</p>
+                    <div class="trending-item">
+                        <a href="#">
+                            <span class="trending-rank">1</span>
+                            Birmingham Development News
+                        </a>
+                    </div>
+                    <div class="trending-item">
+                        <a href="#">
+                            <span class="trending-rank">2</span>
+                            West Midlands Tech Growth
+                        </a>
+                    </div>
+                    <div class="trending-item">
+                        <a href="#">
+                            <span class="trending-rank">3</span>
+                            Local Sports Updates
+                        </a>
+                    </div>
+                    <div class="trending-item">
+                        <a href="#">
+                            <span class="trending-rank">4</span>
+                            Weather Forecast
+                        </a>
+                    </div>
+                    <div class="trending-item">
+                        <a href="#">
+                            <span class="trending-rank">5</span>
+                            Business Investments
+                        </a>
                     </div>
                 </div>
             </div>
 
             <!-- Local Birmingham News -->
             <div class="sidebar-widget local-news">
-                <div class="widget-header">
-                    <h4><i class="fas fa-landmark"></i> Birmingham Local</h4>
-                    <span class="widget-cache" title="Cached for 10 minutes">
-                        <i class="fas fa-bolt"></i> Cached
-                    </span>
-                </div>
+                <h4><i class="fas fa-landmark"></i> Birmingham Local</h4>
                 <div class="local-list" id="localNews">
-                    <!-- Local news yaha aayegi -->
-                    <div class="local-placeholder">
-                        <p>Local Birmingham news loading...</p>
+                    <div class="local-item">
+                        <a href="#">City Council Meeting Updates</a>
                     </div>
-                </div>
-            </div>
-
-            <!-- Cache Statistics -->
-            <div class="sidebar-widget cache-stats">
-                <h4><i class="fas fa-tachometer-alt"></i> Cache Performance</h4>
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-value" id="cacheHits">0</div>
-                        <div class="stat-label">Cache Hits</div>
+                    <div class="local-item">
+                        <a href="#">New Transport Plans for Birmingham</a>
                     </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="apiCalls">0</div>
-                        <div class="stat-label">API Calls</div>
+                    <div class="local-item">
+                        <a href="#">University Expansion News</a>
                     </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="savedRequests">0</div>
-                        <div class="stat-label">Requests Saved</div>
+                    <div class="local-item">
+                        <a href="#">Community Events This Weekend</a>
                     </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="cacheEfficiency">0%</div>
-                        <div class="stat-label">Efficiency</div>
+                    <div class="local-item">
+                        <a href="#">Business Park Development Plans</a>
                     </div>
-                </div>
-                <div class="stats-info">
-                    <p><i class="fas fa-check-circle"></i> Cached data saves API calls</p>
-                    <p><i class="fas fa-check-circle"></i> All visitors benefit from cache</p>
-                    <p><i class="fas fa-check-circle"></i> Automatic cache management</p>
                 </div>
             </div>
 
             <!-- Newsletter -->
             <div class="sidebar-widget newsletter-widget">
                 <h4><i class="fas fa-envelope"></i> Stay Updated</h4>
-                <p>Get daily Birmingham news in your inbox (No API calls for newsletter)</p>
+                <p>Get daily Birmingham news in your inbox</p>
                 <form id="newsletterForm">
                     <input type="email" id="emailInput" placeholder="your@email.com" required>
                     <button type="submit" class="subscribe-btn">
@@ -338,64 +227,60 @@
                     <div class="footer-logo">
                         <i class="fas fa-newspaper"></i>
                         <h3>BhamPulse</h3>
-                        <span class="footer-tag">Optimized Edition</span>
                     </div>
                     <p class="footer-desc">
-                        Birmingham's smart news source. Optimized for NewsAPI's 100 requests/day free limit with intelligent caching.
+                        Birmingham's fastest news source. Real-time updates from across West Midlands.
                     </p>
-                    <div class="footer-badges">
-                        <span class="badge"><i class="fas fa-bolt"></i> Smart Cache</span>
-                        <span class="badge"><i class="fas fa-chart-line"></i> API Optimized</span>
-                        <span class="badge"><i class="fas fa-users"></i> Visitor Friendly</span>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
 
                 <div class="footer-col">
                     <h4>Quick Links</h4>
                     <ul class="footer-links">
-                        <li><a href="#home"><i class="fas fa-home"></i> Home</a></li>
-                        <li><a href="#local"><i class="fas fa-map-marker-alt"></i> Local News</a></li>
-                        <li><a href="#sports"><i class="fas fa-futbol"></i> Sports</a></li>
-                        <li><a href="#business"><i class="fas fa-chart-line"></i> Business</a></li>
-                        <li><a href="#saved"><i class="fas fa-bookmark"></i> Saved Articles</a></li>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#local">Local News</a></li>
+                        <li><a href="#sports">Sports</a></li>
+                        <li><a href="#business">Business</a></li>
+                        <li><a href="#weather">Weather</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-col">
-                    <h4>Optimization Info</h4>
+                    <h4>Resources</h4>
                     <ul class="footer-links">
-                        <li><a href="#" onclick="showCacheInfo()"><i class="fas fa-database"></i> Cache System</a></li>
-                        <li><a href="#" onclick="showApiInfo()"><i class="fas fa-code"></i> API Usage</a></li>
-                        <li><a href="#" onclick="showLimits()"><i class="fas fa-chart-bar"></i> Daily Limits</a></li>
-                        <li><a href="#" onclick="showOptimization()"><i class="fas fa-cogs"></i> Optimization Tips</a></li>
-                        <li><a href="#" onclick="showContact()"><i class="fas fa-envelope"></i> Contact Support</a></li>
+                        <li><a href="#" onclick="showPrivacy()">Privacy Policy</a></li>
+                        <li><a href="#" onclick="showTerms()">Terms of Service</a></li>
+                        <li><a href="#" onclick="showContact()">Contact Us</a></li>
+                        <li><a href="#" onclick="showAbout()">About Us</a></li>
+                        <li><a href="#" onclick="showAdvertise()">Advertise With Us</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-col">
-                    <h4>Technical Info</h4>
+                    <h4>Contact Info</h4>
                     <div class="contact-info">
-                        <p><i class="fas fa-server"></i> <strong>Backend:</strong> Smart Caching System</p>
-                        <p><i class="fas fa-database"></i> <strong>Cache:</strong> 10-minute duration</p>
-                        <p><i class="fas fa-sync-alt"></i> <strong>Refresh:</strong> 30-minute intervals</p>
-                        <p><i class="fas fa-users"></i> <strong>Capacity:</strong> 1000+ visitors/day</p>
+                        <p><i class="fas fa-map-marker-alt"></i> Birmingham, West Midlands</p>
+                        <p><i class="fas fa-envelope"></i> contact@bhampulse.co.uk</p>
+                        <p><i class="fas fa-phone"></i> +44 121 123 4567</p>
                     </div>
                     <div class="news-source">
-                        <p><i class="fas fa-rss"></i> <strong>News Source:</strong> NewsAPI.org</p>
-                        <p><small>Free tier: 100 requests/day optimized</small></p>
+                        <p><strong>News Source:</strong> NewsAPI.org</p>
+                        <p><small>Free plan: 100 requests/day</small></p>
                     </div>
                 </div>
             </div>
 
             <div class="footer-bottom">
                 <div class="copyright">
-                    &copy; 2024 BhamPulse Optimized Edition. All rights reserved.
-                    <span class="api-note">Optimized for NewsAPI's 100 requests/day limit</span>
+                    &copy; 2024 BhamPulse. All rights reserved.
                 </div>
                 <div class="footer-stats">
-                    <span id="totalVisitors">0</span> visitors today •
-                    <span id="apiUsage">0</span> API calls •
-                    <span id="cacheSavings">0</span> requests saved
+                    <span id="articleCount">0</span> articles loaded
                 </div>
             </div>
         </div>
@@ -410,57 +295,6 @@
         </button>
     </div>
 
-    <!-- API Usage Meter (Fixed) -->
-    <div class="api-meter" id="apiMeter">
-        <div class="meter-header">
-            <h5><i class="fas fa-tachometer-alt"></i> API Usage Dashboard</h5>
-            <button class="meter-close" onclick="toggleMeter()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="meter-content">
-            <div class="usage-display">
-                <div class="usage-count-large">
-                    <span id="largeApiCount">0</span>
-                    <span class="usage-total">/100</span>
-                </div>
-                <div class="usage-label-large">Requests Today</div>
-            </div>
-            <div class="meter-bar-container">
-                <div class="meter-bar" id="largeMeterBar">
-                    <div class="meter-fill" id="largeMeterFill" style="width: 0%"></div>
-                </div>
-                <div class="meter-labels">
-                    <span>0</span>
-                    <span>50</span>
-                    <span>100</span>
-                </div>
-            </div>
-            <div class="meter-details">
-                <div class="detail-item">
-                    <span class="detail-label"><i class="fas fa-clock"></i> Resets:</span>
-                    <span class="detail-value" id="meterResetTime">00:00</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label"><i class="fas fa-database"></i> Cache:</span>
-                    <span class="detail-value" id="meterCacheStatus">Active</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label"><i class="fas fa-users"></i> Visitors:</span>
-                    <span class="detail-value" id="meterVisitorCount">0</span>
-                </div>
-            </div>
-            <div class="meter-actions">
-                <button class="meter-btn" onclick="clearCache()">
-                    <i class="fas fa-trash"></i> Clear Cache
-                </button>
-                <button class="meter-btn" onclick="refreshStats()">
-                    <i class="fas fa-sync-alt"></i> Refresh
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Back to Top -->
     <button class="back-to-top" id="backToTop">
         <i class="fas fa-arrow-up"></i>
@@ -468,56 +302,5 @@
 
     <!-- JavaScript -->
     <script src="script.js"></script>
-    <script src="api-counter.js"></script>
-    
-    <!-- Initialize -->
-    <script>
-        // Initialize API meter
-        function toggleMeter() {
-            const meter = document.getElementById('apiMeter');
-            meter.classList.toggle('hidden');
-        }
-        
-        // Show cache info modal
-        function showCacheInfo() {
-            alert('Smart Cache System:\n\n• 10-minute cache duration\n• All visitors share cached data\n• Reduces API calls by 80%\n• Automatic cache management\n• Falls back to sample data if API fails');
-        }
-        
-        // Show API info modal
-        function showApiInfo() {
-            alert('API Usage Optimization:\n\n• Free tier: 100 requests/day\n• Smart caching reduces calls\n• 30-minute auto-refresh interval\n• 2-minute manual refresh cooldown\n• Multiple users = single API call');
-        }
-        
-        // Show limits modal
-        function showLimits() {
-            alert('Daily Limits & Capacity:\n\n• 100 API requests/day (NewsAPI limit)\n• Supports 1000+ daily visitors\n• Cache serves multiple users\n• Reset at midnight (GMT)\n• Monitor usage in dashboard');
-        }
-        
-        // Show optimization tips
-        function showOptimization() {
-            alert('Optimization Tips:\n\n1. Let cache work (10-min intervals)\n2. Use "Load More" instead of refresh\n3. Bookmark articles to save API calls\n4. Share cached links with others\n5. Monitor dashboard for usage');
-        }
-        
-        // Show contact modal
-        function showContact() {
-            alert('Contact & Support:\n\nEmail: support@bhampulse.co.uk\nAPI Issues: check NewsAPI.org status\nOptimization: See dashboard tips\nFeedback: We value your input!');
-        }
-        
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Update reset time
-            const now = new Date();
-            const resetTime = new Date(now);
-            resetTime.setHours(24, 0, 0, 0);
-            const resetText = resetTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            
-            document.getElementById('resetTime').textContent = resetText;
-            document.getElementById('meterResetTime').textContent = resetText;
-            
-            // Update weather time
-            const weatherTime = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            document.getElementById('weatherTime').textContent = `Updated: ${weatherTime}`;
-        });
-    </script>
 </body>
 </html>
