@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bham Pulse | Live Birmingham News</title>
+    <meta name="description" content="Live Birmingham news, weather, sports and breaking updates from West Midlands">
+    <meta name="keywords" content="Birmingham news, West Midlands, UK news, breaking news, local news">
+    <meta name="author" content="Bham Pulse">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- AdSense (Future ke liye) -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YourIDHere" crossorigin="anonymous"></script>
+    
+    <!-- Google Analytics (Optional) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXX');
+    </script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-newspaper"></i>
+                <h1>Bham<span>Pulse</span></h1>
+                <div class="live-badge">
+                    <span class="dot"></span> LIVE
+                </div>
+            </div>
+            
+            <nav class="navbar" id="navbar">
+                <a href="#home" class="nav-link active"><i class="fas fa-home"></i> Home</a>
+                <a href="#local" class="nav-link"><i class="fas fa-map-marker-alt"></i> Local</a>
+                <a href="#sports" class="nav-link"><i class="fas fa-futbol"></i> Sports</a>
+                <a href="#business" class="nav-link"><i class="fas fa-chart-line"></i> Business</a>
+                <a href="#weather" class="nav-link"><i class="fas fa-cloud-sun"></i> Weather</a>
+            </nav>
+            
+            <div class="header-controls">
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search news...">
+                    <button id="searchBtn"><i class="fas fa-search"></i></button>
+                </div>
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Breaking News Ticker -->
+    <div class="breaking-news">
+        <div class="container">
+            <span class="breaking-label"><i class="fas fa-bolt"></i> BREAKING</span>
+            <div class="ticker-container">
+                <marquee behavior="scroll" direction="left" id="newsTicker">
+                    Loading breaking news...
+                </marquee>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container main-content">
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="hero-text">
+                <h2>Birmingham's Live News Hub</h2>
+                <p>Real-time updates, weather, sports & local events from across West Midlands</p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Auto-updates every <strong>15 minutes</strong></span>
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Covering <strong>Birmingham & West Midlands</strong></span>
+                    </div>
+                </div>
+            </div>
+            <div class="weather-widget" id="weatherWidget">
+                <div class="weather-header">
+                    <h3><i class="fas fa-cloud-sun"></i> Birmingham</h3>
+                    <span class="update-time">Updating...</span>
+                </div>
+                <div class="weather-content">
+                    <div class="temp-main">14°C</div>
+                    <div class="weather-desc">Partly Cloudy</div>
+                    <div class="weather-details">
+                        <div><i class="fas fa-wind"></i> 12 km/h</div>
+                        <div><i class="fas fa-tint"></i> 65%</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- News Categories Tabs -->
+        <div class="category-tabs" id="categoryTabs">
+            <button class="tab-btn active" data-category="general">Top Stories</button>
+            <button class="tab-btn" data-category="business">Business</button>
+            <button class="tab-btn" data-category="sports">Sports</button>
+            <button class="tab-btn" data-category="entertainment">Entertainment</button>
+            <button class="tab-btn" data-category="technology">Technology</button>
+            <button class="tab-btn" data-category="health">Health</button>
+        </div>
+
+        <!-- News Grid -->
+        <section class="news-section">
+            <div class="section-header">
+                <h3><i class="fas fa-newspaper"></i> Latest News</h3>
+                <div class="controls">
+                    <button class="refresh-btn" id="refreshBtn">
+                        <i class="fas fa-redo"></i> Refresh
+                    </button>
+                    <span class="last-update" id="lastUpdate">Just now</span>
+                </div>
+            </div>
+
+            <div class="news-container" id="newsContainer">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading latest news...</p>
+                </div>
+            </div>
+
+            <!-- Load More Button -->
+            <div class="load-more-container">
+                <button class="load-more-btn" id="loadMoreBtn">
+                    <i class="fas fa-plus"></i> Load More News
+                </button>
+            </div>
+        </section>
+
+        <!-- Ad Space -->
+        <div class="ad-section">
+            <div class="ad-container">
+                <div class="ad-label">Advertisement</div>
+                <div class="ad-box" id="adTop">
+                    <div class="ad-placeholder">
+                        <i class="fas fa-ad"></i>
+                        <p>Ad Space Available</p>
+                        <small>Perfect for Google AdSense</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Trending Now -->
+            <div class="sidebar-widget trending-widget">
+                <h4><i class="fas fa-fire"></i> Trending Now</h4>
+                <div class="trending-list" id="trendingList">
+                    <!-- Trending topics will load here -->
+                </div>
+            </div>
+
+            <!-- Local Birmingham News -->
+            <div class="sidebar-widget local-news">
+                <h4><i class="fas fa-landmark"></i> Birmingham Local</h4>
+                <div class="local-list" id="localNews">
+                    <!-- Local news will load here -->
+                </div>
+            </div>
+
+            <!-- Newsletter -->
+            <div class="sidebar-widget newsletter-widget">
+                <h4><i class="fas fa-envelope"></i> Stay Updated</h4>
+                <p>Get daily Birmingham news in your inbox</p>
+                <form id="newsletterForm">
+                    <input type="email" id="emailInput" placeholder="your@email.com" required>
+                    <button type="submit" class="subscribe-btn">
+                        <i class="fas fa-paper-plane"></i> Subscribe
+                    </button>
+                </form>
+                <p class="privacy-note">
+                    <small>We respect your privacy. Unsubscribe anytime.</small>
+                </p>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <i class="fas fa-newspaper"></i>
+                        <h3>BhamPulse</h3>
+                    </div>
+                    <p class="footer-desc">
+                        Birmingham's fastest news source. Real-time updates from across West Midlands.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#local">Local News</a></li>
+                        <li><a href="#sports">Sports</a></li>
+                        <li><a href="#business">Business</a></li>
+                        <li><a href="#weather">Weather</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Resources</h4>
+                    <ul class="footer-links">
+                        <li><a href="#" onclick="showPrivacy()">Privacy Policy</a></li>
+                        <li><a href="#" onclick="showTerms()">Terms of Service</a></li>
+                        <li><a href="#" onclick="showContact()">Contact Us</a></li>
+                        <li><a href="#" onclick="showAbout()">About Us</a></li>
+                        <li><a href="#" onclick="showAdvertise()">Advertise With Us</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Contact Info</h4>
+                    <div class="contact-info">
+                        <p><i class="fas fa-map-marker-alt"></i> Birmingham, West Midlands</p>
+                        <p><i class="fas fa-envelope"></i> contact@bhampulse.co.uk</p>
+                        <p><i class="fas fa-phone"></i> +44 121 123 4567</p>
+                    </div>
+                    <div class="news-source">
+                        <p><strong>News Source:</strong> NewsAPI.org</p>
+                        <p><small>Powered by multiple international news sources</small></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="copyright">
+                    &copy; 2024 BhamPulse. All rights reserved.
+                </div>
+                <div class="footer-stats">
+                    <span id="articleCount">0</span> articles loaded •
+                    <span id="updateCount">0</span> updates today
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-info-circle"></i>
+        <span id="notificationText"></span>
+        <button class="notification-close" onclick="hideNotification()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>

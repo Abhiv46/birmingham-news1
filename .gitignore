@@ -1,0 +1,8 @@
+# Bham News Website
+.DS_Store
+Thumbs.db
+.vercel/
+*.log
+node_modules/
+.env
+secrets.json
