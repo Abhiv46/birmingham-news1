@@ -3,274 +3,460 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bham Pulse | Live Birmingham News</title>
-    <meta name="description" content="Live Birmingham news, weather, sports and breaking updates from West Midlands">
-    <meta name="keywords" content="Birmingham news, West Midlands, UK news, breaking news, local news">
+    <title>Bham Pulse | Birmingham's Premier News Source</title>
+    <meta name="description" content="Breaking news, weather, sports and local updates from Birmingham and West Midlands">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- CSS -->
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Header -->
     <header class="header">
         <div class="container">
+            <!-- Logo -->
             <div class="logo">
-                <i class="fas fa-newspaper"></i>
-                <h1>Bham<span>Pulse</span></h1>
-                <div class="live-badge">
-                    <span class="dot"></span> LIVE
+                <div class="logo-icon">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Bham<span style="color:#ff5252">Pulse</span></h1>
+                    <p>Birmingham's News Network</p>
                 </div>
             </div>
             
-            <nav class="navbar" id="navbar">
-                <a href="#home" class="nav-link active"><i class="fas fa-home"></i> Home</a>
-                <a href="#local" class="nav-link"><i class="fas fa-map-marker-alt"></i> Local</a>
-                <a href="#sports" class="nav-link"><i class="fas fa-futbol"></i> Sports</a>
-                <a href="#business" class="nav-link"><i class="fas fa-chart-line"></i> Business</a>
-                <a href="#weather" class="nav-link"><i class="fas fa-cloud-sun"></i> Weather</a>
+            <!-- Live Badge -->
+            <div class="live-badge">
+                <span class="dot"></span>
+                <span>LIVE UPDATES</span>
+            </div>
+            
+            <!-- Main Navigation - FIXED -->
+            <nav class="main-nav" id="mainNav">
+                <div class="nav-item">
+                    <a href="#home" class="nav-link active" data-category="home">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#local" class="nav-link" data-category="local">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Local</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#sports" class="nav-link" data-category="sports">
+                        <i class="fas fa-futbol"></i>
+                        <span>Sports</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#business" class="nav-link" data-category="business">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Business</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#weather" class="nav-link" data-category="weather">
+                        <i class="fas fa-cloud-sun"></i>
+                        <span>Weather</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#entertainment" class="nav-link" data-category="entertainment">
+                        <i class="fas fa-film"></i>
+                        <span>Entertainment</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#technology" class="nav-link" data-category="technology">
+                        <i class="fas fa-laptop-code"></i>
+                        <span>Tech</span>
+                    </a>
+                </div>
             </nav>
             
-            <div class="header-controls">
-                <div class="search-container">
+            <!-- Search -->
+            <div class="search-wrapper">
+                <div class="search-box">
                     <input type="text" id="searchInput" placeholder="Search news...">
-                    <button id="searchBtn"><i class="fas fa-search"></i></button>
+                    <button id="searchBtn" class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
                 </div>
-                <button class="menu-toggle" id="menuToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
             </div>
+            
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
     </header>
 
-    <!-- Breaking News Ticker -->
+    <!-- Breaking News -->
     <div class="breaking-news">
         <div class="container">
-            <span class="breaking-label"><i class="fas fa-bolt"></i> BREAKING</span>
+            <span class="breaking-label">
+                <i class="fas fa-bolt"></i>
+                BREAKING
+            </span>
             <div class="ticker-container">
-                <marquee behavior="scroll" direction="left" id="newsTicker">
+                <div class="ticker-text" id="newsTicker">
                     Loading breaking news...
-                </marquee>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Main Content -->
-    <main class="container main-content">
+    <main class="container">
         <!-- Hero Section -->
-        <section class="hero" id="home">
-            <div class="hero-text">
-                <h2>Birmingham's Live News Hub</h2>
-                <p>Real-time updates, weather, sports & local events from across West Midlands</p>
-                <div class="hero-stats">
-                    <div class="stat">
-                        <i class="fas fa-sync-alt"></i>
-                        <span>Auto-updates every <strong>15 minutes</strong></span>
-                    </div>
-                    <div class="stat">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>Covering <strong>Birmingham & West Midlands</strong></span>
+        <section class="hero-section" id="home">
+            <div class="hero-grid">
+                <!-- Main Hero Content -->
+                <div class="hero-content">
+                    <h1 class="hero-title">Birmingham's Premier News Source</h1>
+                    <p class="hero-subtitle">
+                        Real-time updates, in-depth analysis, and comprehensive coverage of Birmingham 
+                        and the West Midlands. Your trusted source for breaking news, weather, sports, 
+                        and local events.
+                    </p>
+                    
+                    <div class="hero-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-newspaper"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Live Articles</h3>
+                                <p id="liveArticleCount">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Updated</h3>
+                                <p id="updateFrequency">Every 5 Min</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Active Readers</h3>
+                                <p id="readerCount">1.2K</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="weather-widget" id="weatherWidget">
-                <div class="weather-header">
-                    <h3><i class="fas fa-cloud-sun"></i> Birmingham</h3>
-                    <span class="update-time" id="weatherTime">Updated: Just now</span>
-                </div>
-                <div class="weather-content">
-                    <div class="temp-main">14°C</div>
-                    <div class="weather-desc">Partly Cloudy</div>
-                    <div class="weather-details">
-                        <div><i class="fas fa-wind"></i> 12 km/h</div>
-                        <div><i class="fas fa-tint"></i> 65%</div>
+                
+                <!-- Weather Widget -->
+                <div class="weather-widget">
+                    <div class="weather-header">
+                        <h3>
+                            <i class="fas fa-map-marker-alt"></i>
+                            Birmingham
+                        </h3>
+                        <div class="location-info">
+                            <i class="fas fa-sync-alt"></i>
+                            <span id="weatherUpdateTime">Just now</span>
+                        </div>
+                    </div>
+                    
+                    <div class="weather-main">
+                        <div class="current-temp" id="currentTemp">14°C</div>
+                        <div class="weather-condition" id="weatherCondition">Partly Cloudy</div>
+                        
+                        <div class="weather-details">
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-wind"></i>
+                                </div>
+                                <div class="detail-info">
+                                    <h4>Wind</h4>
+                                    <p id="windSpeed">12 km/h</p>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-tint"></i>
+                                </div>
+                                <div class="detail-info">
+                                    <h4>Humidity</h4>
+                                    <p id="humidity">65%</p>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-temperature-high"></i>
+                                </div>
+                                <div class="detail-info">
+                                    <h4>Feels Like</h4>
+                                    <p id="feelsLike">13°C</p>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <div class="detail-info">
+                                    <h4>Visibility</h4>
+                                    <p id="visibility">10 km</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="weather-forecast">
+                        <div class="forecast-title">3-Day Forecast</div>
+                        <div class="forecast-grid" id="forecastGrid">
+                            <!-- Forecast will be added by JavaScript -->
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- News Categories Tabs -->
-        <div class="category-tabs" id="categoryTabs">
-            <button class="tab-btn active" data-category="general">Top Stories</button>
-            <button class="tab-btn" data-category="business">Business</button>
-            <button class="tab-btn" data-category="sports">Sports</button>
-            <button class="tab-btn" data-category="entertainment">Entertainment</button>
-            <button class="tab-btn" data-category="technology">Technology</button>
-            <button class="tab-btn" data-category="health">Health</button>
-        </div>
-
-        <!-- News Grid -->
-        <section class="news-section">
-            <div class="section-header">
-                <h3><i class="fas fa-newspaper"></i> Latest News</h3>
-                <div class="controls">
-                    <button class="refresh-btn" id="refreshBtn">
-                        <i class="fas fa-redo"></i> Refresh
-                    </button>
-                    <span class="last-update" id="lastUpdate">Just now</span>
-                </div>
-            </div>
-
-            <div class="news-container" id="newsContainer">
-                <div class="loading-spinner">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Loading latest news...</p>
-                </div>
-            </div>
-
-            <!-- Load More Button -->
-            <div class="load-more-container">
-                <button class="load-more-btn" id="loadMoreBtn">
-                    <i class="fas fa-plus"></i> Load More News
+        <!-- Category Tabs -->
+        <section class="category-section">
+            <div class="category-tabs" id="categoryTabs">
+                <button class="tab-btn active" data-category="general">
+                    <i class="fas fa-star"></i>
+                    Top Stories
+                </button>
+                <button class="tab-btn" data-category="business">
+                    <i class="fas fa-chart-line"></i>
+                    Business
+                </button>
+                <button class="tab-btn" data-category="sports">
+                    <i class="fas fa-futbol"></i>
+                    Sports
+                </button>
+                <button class="tab-btn" data-category="technology">
+                    <i class="fas fa-laptop-code"></i>
+                    Technology
+                </button>
+                <button class="tab-btn" data-category="entertainment">
+                    <i class="fas fa-film"></i>
+                    Entertainment
+                </button>
+                <button class="tab-btn" data-category="health">
+                    <i class="fas fa-heartbeat"></i>
+                    Health
+                </button>
+                <button class="tab-btn" data-category="science">
+                    <i class="fas fa-flask"></i>
+                    Science
                 </button>
             </div>
         </section>
 
-        <!-- Ad Space -->
-        <div class="ad-section">
-            <div class="ad-container">
-                <div class="ad-label">Advertisement</div>
-                <div class="ad-box" id="adTop">
-                    <div class="ad-placeholder">
-                        <i class="fas fa-ad"></i>
-                        <p>Ad Space Available</p>
-                        <small>Perfect for Google AdSense</small>
+        <!-- News Grid -->
+        <div class="main-content-grid">
+            <!-- Main News Area -->
+            <div class="news-main">
+                <section class="news-section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h2>Latest News</h2>
+                            <div class="category-badge" id="currentCategoryBadge">Top Stories</div>
+                        </div>
+                        <div class="section-controls">
+                            <button class="refresh-btn" id="refreshBtn">
+                                <i class="fas fa-redo"></i>
+                                Refresh News
+                            </button>
+                            <div class="last-update" id="lastUpdate">
+                                Updated: Just now
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="news-grid" id="newsContainer">
+                        <!-- News cards will be loaded here -->
+                        <div class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading latest news...</p>
+                        </div>
+                    </div>
+
+                    <div class="load-more-section">
+                        <button class="load-more-btn" id="loadMoreBtn">
+                            <i class="fas fa-plus"></i>
+                            Load More Stories
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <!-- Trending Now -->
+                <div class="trending-widget">
+                    <div class="widget-header">
+                        <h3>
+                            <i class="fas fa-fire"></i>
+                            Trending Now
+                        </h3>
+                        <a href="#" class="view-all">View All</a>
+                    </div>
+                    <div class="trending-list" id="trendingList">
+                        <!-- Trending items will be loaded here -->
                     </div>
                 </div>
-            </div>
+
+                <!-- Quick Links -->
+                <div class="quick-links-widget">
+                    <div class="widget-header">
+                        <h3>
+                            <i class="fas fa-link"></i>
+                            Quick Access
+                        </h3>
+                    </div>
+                    <div class="links-grid">
+                        <div class="link-card" id="weatherDetailsBtn">
+                            <div class="link-icon">
+                                <i class="fas fa-cloud-sun"></i>
+                            </div>
+                            <h4>Weather Details</h4>
+                            <p>Full forecast & alerts</p>
+                        </div>
+                        <div class="link-card" id="sportsHubBtn">
+                            <div class="link-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <h4>Sports Hub</h4>
+                            <p>Scores & highlights</p>
+                        </div>
+                        <div class="link-card" id="localNewsBtn">
+                            <div class="link-icon">
+                                <i class="fas fa-landmark"></i>
+                            </div>
+                            <h4>Local News</h4>
+                            <p>Birmingham updates</p>
+                        </div>
+                        <div class="link-card" id="businessNewsBtn">
+                            <div class="link-icon">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <h4>Business</h4>
+                            <p>Markets & economy</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="newsletter-widget">
+                    <div class="newsletter-content">
+                        <h3>Stay Informed</h3>
+                        <p>Get daily Birmingham news updates delivered straight to your inbox.</p>
+                        
+                        <form class="newsletter-form" id="newsletterForm">
+                            <div class="form-group">
+                                <input type="email" id="emailInput" placeholder="Your email address" required>
+                            </div>
+                            <button type="submit">
+                                <i class="fas fa-paper-plane"></i>
+                                Subscribe Now
+                            </button>
+                        </form>
+                        
+                        <p class="newsletter-note">
+                            We respect your privacy. Unsubscribe anytime.
+                        </p>
+                    </div>
+                </div>
+            </aside>
         </div>
-
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <!-- Trending Now -->
-            <div class="sidebar-widget trending-widget">
-                <h4><i class="fas fa-fire"></i> Trending Now</h4>
-                <div class="trending-list" id="trendingList">
-                    <div class="trending-item">
-                        <a href="#">
-                            <span class="trending-rank">1</span>
-                            Birmingham Development News
-                        </a>
-                    </div>
-                    <div class="trending-item">
-                        <a href="#">
-                            <span class="trending-rank">2</span>
-                            West Midlands Tech Growth
-                        </a>
-                    </div>
-                    <div class="trending-item">
-                        <a href="#">
-                            <span class="trending-rank">3</span>
-                            Local Sports Updates
-                        </a>
-                    </div>
-                    <div class="trending-item">
-                        <a href="#">
-                            <span class="trending-rank">4</span>
-                            Weather Forecast
-                        </a>
-                    </div>
-                    <div class="trending-item">
-                        <a href="#">
-                            <span class="trending-rank">5</span>
-                            Business Investments
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Local Birmingham News -->
-            <div class="sidebar-widget local-news">
-                <h4><i class="fas fa-landmark"></i> Birmingham Local</h4>
-                <div class="local-list" id="localNews">
-                    <div class="local-item">
-                        <a href="#">City Council Meeting Updates</a>
-                    </div>
-                    <div class="local-item">
-                        <a href="#">New Transport Plans for Birmingham</a>
-                    </div>
-                    <div class="local-item">
-                        <a href="#">University Expansion News</a>
-                    </div>
-                    <div class="local-item">
-                        <a href="#">Community Events This Weekend</a>
-                    </div>
-                    <div class="local-item">
-                        <a href="#">Business Park Development Plans</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Newsletter -->
-            <div class="sidebar-widget newsletter-widget">
-                <h4><i class="fas fa-envelope"></i> Stay Updated</h4>
-                <p>Get daily Birmingham news in your inbox</p>
-                <form id="newsletterForm">
-                    <input type="email" id="emailInput" placeholder="your@email.com" required>
-                    <button type="submit" class="subscribe-btn">
-                        <i class="fas fa-paper-plane"></i> Subscribe
-                    </button>
-                </form>
-                <p class="privacy-note">
-                    <small>We respect your privacy. Unsubscribe anytime.</small>
-                </p>
-            </div>
-        </aside>
     </main>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
-                <div class="footer-col">
+                <div class="footer-brand">
                     <div class="footer-logo">
                         <i class="fas fa-newspaper"></i>
                         <h3>BhamPulse</h3>
                     </div>
-                    <p class="footer-desc">
-                        Birmingham's fastest news source. Real-time updates from across West Midlands.
+                    <p class="footer-description">
+                        Birmingham's most trusted news source, delivering accurate, timely, 
+                        and comprehensive coverage of the West Midlands since 2024.
                     </p>
-                    <div class="social-links">
-                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                    <div class="footer-social">
+                        <a href="#" class="social-link">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-youtube"></i>
+                        </a>
                     </div>
                 </div>
 
-                <div class="footer-col">
+                <div class="footer-links">
                     <h4>Quick Links</h4>
-                    <ul class="footer-links">
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#local">Local News</a></li>
-                        <li><a href="#sports">Sports</a></li>
-                        <li><a href="#business">Business</a></li>
-                        <li><a href="#weather">Weather</a></li>
+                    <ul>
+                        <li><a href="#home"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="#local"><i class="fas fa-chevron-right"></i> Local News</a></li>
+                        <li><a href="#sports"><i class="fas fa-chevron-right"></i> Sports</a></li>
+                        <li><a href="#business"><i class="fas fa-chevron-right"></i> Business</a></li>
+                        <li><a href="#weather"><i class="fas fa-chevron-right"></i> Weather</a></li>
                     </ul>
                 </div>
 
-                <div class="footer-col">
-                    <h4>Resources</h4>
-                    <ul class="footer-links">
-                        <li><a href="#" onclick="showPrivacy()">Privacy Policy</a></li>
-                        <li><a href="#" onclick="showTerms()">Terms of Service</a></li>
-                        <li><a href="#" onclick="showContact()">Contact Us</a></li>
-                        <li><a href="#" onclick="showAbout()">About Us</a></li>
-                        <li><a href="#" onclick="showAdvertise()">Advertise With Us</a></li>
+                <div class="footer-links">
+                    <h4>Categories</h4>
+                    <ul>
+                        <li><a href="#politics"><i class="fas fa-chevron-right"></i> Politics</a></li>
+                        <li><a href="#technology"><i class="fas fa-chevron-right"></i> Technology</a></li>
+                        <li><a href="#entertainment"><i class="fas fa-chevron-right"></i> Entertainment</a></li>
+                        <li><a href="#health"><i class="fas fa-chevron-right"></i> Health</a></li>
+                        <li><a href="#education"><i class="fas fa-chevron-right"></i> Education</a></li>
                     </ul>
                 </div>
 
-                <div class="footer-col">
-                    <h4>Contact Info</h4>
+                <div class="footer-contact">
+                    <h4>Contact Us</h4>
                     <div class="contact-info">
-                        <p><i class="fas fa-map-marker-alt"></i> Birmingham, West Midlands</p>
-                        <p><i class="fas fa-envelope"></i> contact@bhampulse.co.uk</p>
-                        <p><i class="fas fa-phone"></i> +44 121 123 4567</p>
-                    </div>
-                    <div class="news-source">
-                        <p><strong>News Source:</strong> NewsAPI.org</p>
-                        <p><small>Free plan: 100 requests/day</small></p>
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h5>Address</h5>
+                                <p>Birmingham, West Midlands</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h5>Email</h5>
+                                <p>contact@bhampulse.co.uk</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h5>Phone</h5>
+                                <p>+44 121 123 4567</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -279,26 +465,14 @@
                 <div class="copyright">
                     &copy; 2024 BhamPulse. All rights reserved.
                 </div>
-                <div class="footer-stats">
-                    <span id="articleCount">0</span> articles loaded
+                <div class="footer-links-bottom">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Policy</a>
                 </div>
             </div>
         </div>
     </footer>
-
-    <!-- Notification -->
-    <div class="notification" id="notification">
-        <i class="fas fa-info-circle"></i>
-        <span id="notificationText"></span>
-        <button class="notification-close" onclick="hideNotification()">
-            <i class="fas fa-times"></i>
-        </button>
-    </div>
-
-    <!-- Back to Top -->
-    <button class="back-to-top" id="backToTop">
-        <i class="fas fa-arrow-up"></i>
-    </button>
 
     <!-- JavaScript -->
     <script src="script.js"></script>
