@@ -1,666 +1,891 @@
 // ============================================
-// BhamPulse - COMPLETE FREE LIVE NEWS SYSTEM
-// 4 Steps + 2 Alternatives for 100% Uptime
+// DOM ELEMENTS
 // ============================================
 
-// ========== STEP 1: RSS FEEDS CONFIGURATION ==========
-const RSS_FEEDS = {
-    // BBC Feeds (Most Reliable)
-    bbc_uk: 'https://feeds.bbci.co.uk/news/rss.xml',
-    bbc_england: 'https://feeds.bbci.co.uk/news/england/rss.xml',
-    bbc_business: 'https://feeds.bbci.co.uk/news/business/rss.xml',
-    bbc_technology: 'https://feeds.bbci.co.uk/news/technology/rss.xml',
-    bbc_sports: 'https://feeds.bbci.co.uk/sport/rss.xml',
-    bbc_entertainment: 'https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml',
-    bbc_health: 'https://feeds.bbci.co.uk/news/health/rss.xml',
-    
-    // Guardian Feeds (Backup)
-    guardian_uk: 'https://www.theguardian.com/uk/rss',
-    guardian_world: 'https://www.theguardian.com/world/rss',
-    guardian_sport: 'https://www.theguardian.com/uk/sport/rss',
-    
-    // Birmingham Local Feeds
-    birmingham_live: 'https://www.birminghammail.co.uk/?service=rss',
-    birmingham_express: 'https://www.expressandstar.com/feed/'
-};
+// Header & Navigation
+const menuToggle = document.getElementById('menuToggle');
+const mainNav = document.getElementById('mainNav');
+const searchInput = document.getElementById('searchInput');
+const searchBtn = document.getElementById('searchBtn');
 
-// ========== STEP 2: CORE RSS FETCH FUNCTION ==========
-async function fetchLiveNewsFromRSS(category = 'general') {
-    console.log(`📡 STEP 1: Fetching LIVE ${category} news from RSS...`);
-    
-    try {
-        // Select appropriate RSS feed
-        const feedUrl = selectRSSFeed(category);
-        
-        // Method 1: Direct RSS parsing (No API needed)
-        const articles = await parseRSSDirectly(feedUrl);
-        
-        if (articles.length > 0) {
-            console.log(`✅ STEP 1 SUCCESS: Got ${articles.length} LIVE articles`);
-            displayLiveNews(articles, category);
-            updateLiveStats(articles.length);
-            return articles;
-        }
-        
-        // If Method 1 fails, try Method 2
-        console.log('🔄 Trying RSS via JSON converter...');
-        const articles2 = await parseRSSviaJSON(feedUrl);
-        
-        if (articles2.length > 0) {
-            console.log(`✅ STEP 1 SUCCESS (Method 2): ${articles2.length} articles`);
-            displayLiveNews(articles2, category);
-            updateLiveStats(articles2.length);
-            return articles2;
-        }
-        
-        throw new Error('No articles found from RSS');
-        
-    } catch (error) {
-        console.error('❌ STEP 1 FAILED:', error.message);
-        return await tryAlternativeSources(category); // Go to STEP 3
-    }
-}
+// Breaking News Ticker
+const newsTicker = document.getElementById('newsTicker');
 
-// ========== STEP 3: ALTERNATIVE SOURCES ==========
-async function tryAlternativeSources(category) {
-    console.log('📡 STEP 3: Trying Alternative Sources...');
-    
-    // Try each alternative until one works
-    const alternatives = [
-        fetchFromGuardianAPI,
-        fetchFromReutersRSS,
-        fetchFromNYTimesRSS,
-        fetchFromMultipleBBCFeeds
-    ];
-    
-    for (let i = 0; i < alternatives.length; i++) {
-        try {
-            console.log(`Trying Alternative ${i + 1}...`);
-            const articles = await alternatives[i](category);
-            
-            if (articles && articles.length > 0) {
-                console.log(`✅ Alternative ${i + 1} SUCCESS: ${articles.length} articles`);
-                displayLiveNews(articles, category);
-                showNotification(`✓ News from Alternative Source ${i + 1}`, 'info');
-                return articles;
-            }
-        } catch (err) {
-            console.log(`Alternative ${i + 1} failed:`, err.message);
-            continue;
-        }
-    }
-    
-    // If all alternatives fail, go to STEP 4
-    console.log('❌ All alternatives failed');
-    return await generateLocalNews(category);
-}
+// Weather Elements
+const weatherUpdateTime = document.getElementById('weatherUpdateTime');
+const currentTemp = document.getElementById('currentTemp');
+const weatherCondition = document.getElementById('weatherCondition');
+const windSpeed = document.getElementById('windSpeed');
+const humidity = document.getElementById('humidity');
+const feelsLike = document.getElementById('feelsLike');
+const visibility = document.getElementById('visibility');
+const forecastGrid = document.getElementById('forecastGrid');
 
-// ========== STEP 4: LOCAL NEWS GENERATION ==========
-async function generateLocalNews(category) {
-    console.log('📡 STEP 4: Generating Local Birmingham News...');
+// Stats
+const liveArticleCount = document.getElementById('liveArticleCount');
+const readerCount = document.getElementById('readerCount');
+
+// Category Tabs & News
+const categoryTabs = document.getElementById('categoryTabs');
+const currentCategoryBadge = document.getElementById('currentCategoryBadge');
+const newsContainer = document.getElementById('newsContainer');
+const refreshBtn = document.getElementById('refreshBtn');
+const lastUpdate = document.getElementById('lastUpdate');
+const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+// Sidebar Elements
+const trendingList = document.getElementById('trendingList');
+const newsletterForm = document.getElementById('newsletterForm');
+const emailInput = document.getElementById('emailInput');
+
+// Quick Links
+const weatherDetailsBtn = document.getElementById('weatherDetailsBtn');
+const sportsHubBtn = document.getElementById('sportsHubBtn');
+const localNewsBtn = document.getElementById('localNewsBtn');
+const businessNewsBtn = document.getElementById('businessNewsBtn');
+
+// ============================================
+// GLOBAL VARIABLES
+// ============================================
+
+let currentCategory = 'general';
+let currentPage = 1;
+const articlesPerPage = 6;
+let allArticles = [];
+
+// Mock API Configuration
+const MOCK_API_DELAY = 800; // milliseconds
+
+// ============================================
+// INITIALIZATION
+// ============================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('BhamPulse - Birmingham News Hub initialized');
     
-    // Create local Birmingham news (always works)
-    const localNews = [
-        {
-            title: "Birmingham City Centre Development Update",
-            description: "Major regeneration projects progressing across city centre with new investments",
-            url: "#",
-            urlToImage: "https://images.unsplash.com/photo-1589810635657-232948472d98?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-            publishedAt: new Date().toISOString(),
-            source: { name: "Birmingham Pulse Local" },
-            category: category,
-            isLocal: true
-        },
-        {
-            title: "West Midlands Transport Improvements",
-            description: "New transport links and infrastructure upgrades announced for the region",
-            url: "#",
-            urlToImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-            publishedAt: new Date().toISOString(),
-            source: { name: "Local Transport Authority" },
-            category: category,
-            isLocal: true
-        },
-        {
-            title: "Birmingham Tech Sector Growth Report",
-            description: "Local technology companies see record investment and job creation",
-            url: "#",
-            urlToImage: "https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-            publishedAt: new Date().toISOString(),
-            source: { name: "Tech Midlands" },
-            category: category,
-            isLocal: true
-        },
-        {
-            title: "Community Events This Weekend",
-            description: "Local festivals, markets, and cultural events happening across Birmingham",
-            url: "#",
-            urlToImage: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-            publishedAt: new Date().toISOString(),
-            source: { name: "Community Board" },
-            category: category,
-            isLocal: true
-        },
-        {
-            title: "Weather Update: Pleasant Weekend Ahead",
-            description: "Clear skies and mild temperatures expected across West Midlands",
-            url: "#",
-            urlToImage: "https://images.unsplash.com/photo-1563974318767-a4de855d8b43?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-            publishedAt: new Date().toISOString(),
-            source: { name: "Local Met Office" },
-            category: category,
-            isLocal: true
-        }
-    ];
+    // Initialize all components
+    initNavigation();
+    initBreakingNews();
+    initWeather();
+    initStats();
+    initCategoryTabs();
+    initNews();
+    initSidebar();
+    initQuickLinks();
     
-    displayLiveNews(localNews, category);
-    showNotification("📰 Showing Local Birmingham News", "info");
-    return localNews;
-}
-
-// ========== ALTERNATIVE METHOD 1: Guardian API ==========
-async function fetchFromGuardianAPI(category) {
-    try {
-        const apiKey = 'test'; // Guardian's free test key
-        const query = category === 'local' ? 'Birmingham' : '';
-        
-        const url = `https://content.guardianapis.com/search?q=${query}&api-key=${apiKey}&show-fields=thumbnail,trailText&page-size=15&order-by=newest`;
-        
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Guardian API failed');
-        
-        const data = await response.json();
-        
-        return data.response.results.map(item => ({
-            title: item.webTitle,
-            description: item.fields?.trailText || 'Read full article',
-            url: item.webUrl,
-            urlToImage: item.fields?.thumbnail || getDefaultImage(category),
-            publishedAt: item.webPublicationDate,
-            source: { name: 'The Guardian' },
-            category: category,
-            isAlternative: true
-        }));
-        
-    } catch (error) {
-        console.log('Guardian API failed:', error.message);
-        throw error;
-    }
-}
-
-// ========== ALTERNATIVE METHOD 2: Multiple BBC Feeds ==========
-async function fetchFromMultipleBBCFeeds(category) {
-    try {
-        const feeds = [
-            'https://feeds.bbci.co.uk/news/rss.xml',
-            'https://feeds.bbci.co.uk/news/england/rss.xml',
-            'https://feeds.bbci.co.uk/news/uk/rss.xml'
-        ];
-        
-        let allArticles = [];
-        
-        for (const feedUrl of feeds) {
-            try {
-                const articles = await parseRSSDirectly(feedUrl);
-                if (articles.length > 0) {
-                    allArticles = [...allArticles, ...articles];
-                    if (allArticles.length >= 10) break;
-                }
-            } catch (err) {
-                continue;
-            }
-        }
-        
-        if (allArticles.length > 0) {
-            // Filter by category if needed
-            return allArticles.slice(0, 15).map(article => ({
-                ...article,
-                category: category,
-                isAlternative: true
-            }));
-        }
-        
-        throw new Error('No BBC feeds worked');
-        
-    } catch (error) {
-        throw error;
-    }
-}
-
-// ========== HELPER FUNCTIONS ==========
-function selectRSSFeed(category) {
-    const feedMap = {
-        'general': RSS_FEEDS.bbc_uk,
-        'local': RSS_FEEDS.bbc_england,
-        'sports': RSS_FEEDS.bbc_sports,
-        'business': RSS_FEEDS.bbc_business,
-        'technology': RSS_FEEDS.bbc_technology,
-        'entertainment': RSS_FEEDS.bbc_entertainment,
-        'health': RSS_FEEDS.bbc_health
-    };
+    // Set initial update time
+    updateLastUpdateTime();
     
-    return feedMap[category] || RSS_FEEDS.bbc_uk;
-}
+    // Auto-refresh news every 5 minutes
+    setInterval(() => {
+        refreshNews();
+        updateWeatherTime();
+    }, 5 * 60 * 1000);
+});
 
-async function parseRSSDirectly(feedUrl) {
-    try {
-        // Fetch RSS XML
-        const response = await fetch(feedUrl);
-        const xmlText = await response.text();
-        
-        // Parse XML using DOMParser
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-        
-        // Extract items
-        const items = xmlDoc.getElementsByTagName("item");
-        const articles = [];
-        
-        for (let i = 0; i < Math.min(items.length, 15); i++) {
-            const item = items[i];
-            
-            const title = item.getElementsByTagName("title")[0]?.textContent || 'News Update';
-            const description = item.getElementsByTagName("description")[0]?.textContent || '';
-            const link = item.getElementsByTagName("link")[0]?.textContent || '#';
-            const pubDate = item.getElementsByTagName("pubDate")[0]?.textContent || new Date().toISOString();
-            
-            // Extract image
-            let imageUrl = '';
-            const enclosure = item.getElementsByTagName("enclosure")[0];
-            if (enclosure && enclosure.getAttribute("type")?.includes("image")) {
-                imageUrl = enclosure.getAttribute("url");
-            }
-            
-            // Try media:content
-            const mediaContent = item.getElementsByTagName("media:content")[0];
-            if (mediaContent && !imageUrl) {
-                imageUrl = mediaContent.getAttribute("url");
-            }
-            
-            articles.push({
-                title: title,
-                description: cleanDescription(description),
-                url: link,
-                urlToImage: imageUrl || getDefaultImage(),
-                publishedAt: pubDate,
-                source: { name: "Live News Feed" },
-                isRSS: true
-            });
-        }
-        
-        return articles;
-        
-    } catch (error) {
-        console.log('Direct RSS parsing failed:', error.message);
-        throw error;
-    }
-}
+// ============================================
+// NAVIGATION & SEARCH
+// ============================================
 
-async function parseRSSviaJSON(feedUrl) {
-    try {
-        // Use free RSS to JSON service
-        const rssToJsonUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
-        
-        const response = await fetch(rssToJsonUrl);
-        const data = await response.json();
-        
-        if (data.status === 'ok' && data.items && data.items.length > 0) {
-            return data.items.map(item => ({
-                title: item.title || 'Latest News',
-                description: cleanDescription(item.description || ''),
-                url: item.link || '#',
-                urlToImage: item.enclosure?.link || item.thumbnail || getDefaultImage(),
-                publishedAt: item.pubDate || new Date().toISOString(),
-                source: { name: data.feed?.title || 'Live Feed' },
-                isRSS: true
-            }));
-        }
-        
-        throw new Error('No items in RSS feed');
-        
-    } catch (error) {
-        throw error;
-    }
-}
-
-// Additional helper functions
-function cleanDescription(desc) {
-    // Remove HTML tags
-    return desc.replace(/<[^>]*>/g, '').substring(0, 150);
-}
-
-function getDefaultImage(category = 'general') {
-    const images = {
-        general: 'https://images.unsplash.com/photo-1588681664899-f142ff2dc9b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
-        sports: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
-        business: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
-        technology: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
-        entertainment: 'https://images.unsplash.com/photo-1499364615650-ec38552f4f34?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
-        health: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
-    };
-    
-    return images[category] || images.general;
-}
-
-// ========== DISPLAY FUNCTIONS ==========
-function displayLiveNews(articles, category) {
-    const container = document.getElementById('newsContainer');
-    if (!container) return;
-    
-    container.innerHTML = '';
-    
-    if (!articles || articles.length === 0) {
-        container.innerHTML = `
-            <div class="no-news">
-                <div class="loading-pulse">
-                    <i class="fas fa-satellite-dish"></i>
-                </div>
-                <h3>Fetching LIVE News...</h3>
-                <p>Connecting to news sources</p>
-            </div>
-        `;
-        return;
-    }
-    
-    // Create news cards
-    articles.forEach((article, index) => {
-        const card = createLiveNewsCard(article, index + 1);
-        container.appendChild(card);
+function initNavigation() {
+    // Mobile Menu Toggle
+    menuToggle.addEventListener('click', function() {
+        mainNav.classList.toggle('active');
+        this.innerHTML = mainNav.classList.contains('active') 
+            ? '<i class="fas fa-times"></i>' 
+            : '<i class="fas fa-bars"></i>';
     });
     
-    // Update stats
-    updateLiveStats(articles.length);
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!menuToggle.contains(event.target) && !mainNav.contains(event.target)) {
+            mainNav.classList.remove('active');
+            menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        }
+    });
     
-    // Update breaking news
-    if (articles.length > 0) {
-        updateBreakingNewsTicker(articles[0].title);
+    // Navigation active state
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            navLinks.forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Close mobile menu after selection
+            mainNav.classList.remove('active');
+            menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            
+            // Scroll to section
+            const targetId = this.getAttribute('href');
+            if (targetId && targetId !== '#') {
+                const targetSection = document.querySelector(targetId);
+                if (targetSection) {
+                    window.scrollTo({
+                        top: targetSection.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        });
+    });
+    
+    // Search functionality
+    searchBtn.addEventListener('click', performSearch);
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
+}
+
+function performSearch() {
+    const query = searchInput.value.trim();
+    if (query) {
+        alert(`Searching for: "${query}"\n\nIn a real application, this would fetch search results from a news API.`);
+        searchInput.value = '';
+    } else {
+        searchInput.focus();
     }
 }
 
-function createLiveNewsCard(article, index) {
+// ============================================
+// BREAKING NEWS TICKER
+// ============================================
+
+function initBreakingNews() {
+    // Mock breaking news headlines
+    const breakingNews = [
+        "New transportation plan approved for Birmingham city center to reduce congestion",
+        "West Midlands tech investment reaches record high in Q1 2024",
+        "Birmingham City FC announces major stadium renovation project",
+        "Severe weather warning issued for parts of West Midlands tomorrow",
+        "Local startup secures £5 million funding for green energy innovation"
+    ];
+    
+    // Combine into ticker text
+    const tickerText = breakingNews.join(' • ');
+    newsTicker.textContent = tickerText;
+    
+    // Ensure the ticker animation works with the new content
+    newsTicker.style.animation = 'none';
+    setTimeout(() => {
+        newsTicker.style.animation = 'ticker 30s linear infinite';
+    }, 10);
+}
+
+// ============================================
+// WEATHER WIDGET
+// ============================================
+
+function initWeather() {
+    updateWeatherTime();
+    generateWeatherForecast();
+    
+    // Update weather time every minute
+    setInterval(updateWeatherTime, 60000);
+}
+
+function updateWeatherTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-GB', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false 
+    });
+    weatherUpdateTime.textContent = `Updated at ${timeString}`;
+}
+
+function generateWeatherForecast() {
+    // Mock 3-day forecast data
+    const forecastData = [
+        { day: 'Today', temp: '14°C', condition: 'Partly Cloudy', icon: 'fa-cloud-sun' },
+        { day: 'Tomorrow', temp: '12°C', condition: 'Light Rain', icon: 'fa-cloud-rain' },
+        { day: 'Wed', temp: '16°C', condition: 'Sunny', icon: 'fa-sun' }
+    ];
+    
+    // Clear existing forecast
+    forecastGrid.innerHTML = '';
+    
+    // Generate forecast cards
+    forecastData.forEach(day => {
+        const forecastDay = document.createElement('div');
+        forecastDay.className = 'forecast-day';
+        forecastDay.innerHTML = `
+            <div class="day-name">${day.day}</div>
+            <div class="forecast-icon"><i class="fas ${day.icon}"></i></div>
+            <div class="day-temp">${day.temp}</div>
+            <div class="day-condition">${day.condition}</div>
+        `;
+        forecastGrid.appendChild(forecastDay);
+    });
+}
+
+// ============================================
+// STATISTICS
+// ============================================
+
+function initStats() {
+    // Mock live article count with animation
+    let count = 0;
+    const targetCount = 127;
+    const increment = Math.ceil(targetCount / 100);
+    
+    const counterInterval = setInterval(() => {
+        count += increment;
+        if (count >= targetCount) {
+            count = targetCount;
+            clearInterval(counterInterval);
+        }
+        liveArticleCount.textContent = count;
+    }, 20);
+    
+    // Animate reader count
+    setTimeout(() => {
+        readerCount.textContent = '1.4K';
+    }, 1500);
+}
+
+// ============================================
+// CATEGORY TABS
+// ============================================
+
+function initCategoryTabs() {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Update active tab
+            tabBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update category
+            const newCategory = this.getAttribute('data-category');
+            if (newCategory !== currentCategory) {
+                currentCategory = newCategory;
+                currentPage = 1;
+                
+                // Update category badge
+                currentCategoryBadge.textContent = formatCategoryName(newCategory);
+                
+                // Load news for new category
+                loadNews();
+            }
+        });
+    });
+}
+
+function formatCategoryName(category) {
+    return category === 'general' ? 'Top Stories' : 
+           category.charAt(0).toUpperCase() + category.slice(1);
+}
+
+// ============================================
+// NEWS SYSTEM
+// ============================================
+
+function initNews() {
+    // Load initial news
+    loadNews();
+    
+    // Refresh button
+    refreshBtn.addEventListener('click', refreshNews);
+    
+    // Load more button
+    loadMoreBtn.addEventListener('click', loadMoreNews);
+}
+
+function loadNews() {
+    // Show loading state
+    newsContainer.innerHTML = `
+        <div class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading ${formatCategoryName(currentCategory).toLowerCase()}...</p>
+        </div>
+    `;
+    
+    // Simulate API delay
+    setTimeout(() => {
+        // Fetch mock news data
+        allArticles = getMockNewsData(currentCategory);
+        
+        // Display first page
+        displayNewsPage(1);
+        
+        // Update last update time
+        updateLastUpdateTime();
+    }, MOCK_API_DELAY);
+}
+
+function refreshNews() {
+    // Add spin animation to refresh button
+    refreshBtn.innerHTML = '<i class="fas fa-redo fa-spin"></i> Refreshing...';
+    
+    // Simulate API call
+    setTimeout(() => {
+        // Reload news
+        loadNews();
+        
+        // Restore refresh button
+        refreshBtn.innerHTML = '<i class="fas fa-redo"></i> Refresh News';
+        
+        // Show refresh confirmation
+        showNotification('News updated with latest stories');
+    }, MOCK_API_DELAY);
+}
+
+function loadMoreNews() {
+    currentPage++;
+    displayNewsPage(currentPage);
+}
+
+function displayNewsPage(page) {
+    // Calculate articles to show
+    const startIndex = 0; // Always show from beginning for simplicity
+    const endIndex = page * articlesPerPage;
+    const articlesToShow = allArticles.slice(startIndex, endIndex);
+    
+    // Clear container if first page
+    if (page === 1) {
+        newsContainer.innerHTML = '';
+    }
+    
+    // Check if there are more articles to load
+    if (endIndex >= allArticles.length) {
+        loadMoreBtn.style.display = 'none';
+    } else {
+        loadMoreBtn.style.display = 'flex';
+    }
+    
+    // Display articles
+    articlesToShow.forEach(article => {
+        const newsCard = createNewsCard(article);
+        newsContainer.appendChild(newsCard);
+    });
+}
+
+function createNewsCard(article) {
     const card = document.createElement('div');
-    card.className = 'news-card live-news-card';
-    
-    // Add live badge if it's real-time
-    const liveBadge = article.isLocal ? '' : `
-        <div class="live-indicator">
-            <span class="live-dot"></span>
-            LIVE
-        </div>
-    `;
-    
-    // Add source badge
-    const sourceBadge = article.isLocal ? 'LOCAL' : 
-                       article.isRSS ? 'LIVE' : 'SOURCE';
-    
+    card.className = 'news-card';
     card.innerHTML = `
-        ${liveBadge}
-        
-        <div class="news-image-container">
-            <img src="${article.urlToImage}" 
-                 alt="${article.title}"
-                 class="news-image"
-                 loading="lazy"
-                 onerror="this.src='${getDefaultImage(article.category)}'">
-            <div class="news-index">${index}</div>
+        <div class="card-image">
+            <i class="fas fa-${article.icon}"></i>
         </div>
-        
-        <div class="news-content">
-            <div class="news-header">
-                <span class="news-source-tag ${article.isLocal ? 'local-tag' : 'live-tag'}">
-                    ${sourceBadge}
-                </span>
-                <span class="news-time">
-                    <i class="far fa-clock"></i>
-                    ${formatTimeAgo(article.publishedAt)}
-                </span>
-            </div>
-            
-            <h3 class="news-title">
-                <a href="${article.url}" target="_blank" onclick="openArticle(event, ${JSON.stringify(article).replace(/"/g, '&quot;')})">
-                    ${article.title}
-                </a>
-            </h3>
-            
-            <p class="news-description">
-                ${article.description}
-            </p>
-            
-            <div class="news-footer">
-                <span class="news-category-badge">
-                    ${(article.category || 'GENERAL').toUpperCase()}
-                </span>
-                <button class="read-full-btn" onclick="openArticle(event, ${JSON.stringify(article).replace(/"/g, '&quot;')})">
-                    <i class="fas fa-external-link-alt"></i>
-                    Read Full
-                </button>
+        <div class="card-content">
+            <span class="card-category">${article.category}</span>
+            <h3 class="card-title">${article.title}</h3>
+            <p class="card-excerpt">${article.excerpt}</p>
+            <div class="card-meta">
+                <span class="card-source">${article.source}</span>
+                <span class="card-time"><i class="far fa-clock"></i> ${article.time}</span>
             </div>
         </div>
     `;
+    
+    // Add click event
+    card.addEventListener('click', () => {
+        alert(`Opening article: "${article.title}"\n\nIn a real application, this would navigate to the full article page.`);
+    });
     
     return card;
 }
 
-function updateLiveStats(count) {
-    // Update counters in the UI
-    const countElements = [
-        document.getElementById('liveArticleCount'),
-        document.getElementById('articleCount'),
-        document.querySelector('.stat-card:nth-child(1) p')
-    ];
-    
-    countElements.forEach(el => {
-        if (el) el.textContent = count;
-    });
-    
-    // Update last update time
-    const updateElements = [
-        document.getElementById('lastUpdate'),
-        document.querySelector('.last-update')
-    ];
-    
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-    
-    updateElements.forEach(el => {
-        if (el) el.textContent = `Updated: ${timeStr}`;
-    });
-}
-
-function updateBreakingNewsTicker(headline) {
-    const ticker = document.getElementById('newsTicker');
-    if (!ticker) return;
-    
-    const tickerText = `BREAKING: ${headline.substring(0, 80)}... | `;
-    ticker.innerHTML = tickerText.repeat(3);
-}
-
-function formatTimeAgo(dateString) {
-    try {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffMs = now - date;
-        
-        const minutes = Math.floor(diffMs / 60000);
-        const hours = Math.floor(diffMs / 3600000);
-        
-        if (minutes < 1) return 'Just now';
-        if (minutes < 60) return `${minutes}m ago`;
-        if (hours < 24) return `${hours}h ago`;
-        
-        return date.toLocaleDateString('en-GB', { 
-            day: 'numeric', 
-            month: 'short' 
-        });
-    } catch (e) {
-        return 'Recently';
-    }
-}
-
-// ========== INITIALIZATION ==========
-let currentCategory = 'general';
-
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 BhamPulse LIVE News System Initializing...');
-    
-    // Load initial news
-    fetchLiveNewsFromRSS(currentCategory);
-    
-    // Setup category switching
-    setupCategoryNavigation();
-    
-    // Setup auto-refresh every 2 minutes
-    setInterval(() => {
-        if (document.visibilityState === 'visible') {
-            fetchLiveNewsFromRSS(currentCategory);
-        }
-    }, 2 * 60 * 1000);
-    
-    // Setup refresh button
-    const refreshBtn = document.getElementById('refreshBtn');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', function() {
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
-            fetchLiveNewsFromRSS(currentCategory);
-            setTimeout(() => {
-                this.innerHTML = '<i class="fas fa-redo"></i> Refresh News';
-            }, 2000);
-        });
-    }
-});
-
-function setupCategoryNavigation() {
-    // Setup category tabs
-    const tabButtons = document.querySelectorAll('.tab-btn, .nav-link[data-category]');
-    
-    tabButtons.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Update active state
-            tabButtons.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Get category
-            const category = this.dataset.category || 'general';
-            currentCategory = category;
-            
-            // Load news for category
-            fetchLiveNewsFromRSS(category);
-            
-            // Update category badge
-            const badge = document.getElementById('currentCategoryBadge');
-            if (badge) {
-                const categoryNames = {
-                    'general': 'Top Stories',
-                    'local': 'Birmingham Local',
-                    'sports': 'Sports',
-                    'business': 'Business',
-                    'technology': 'Technology',
-                    'entertainment': 'Entertainment',
-                    'health': 'Health'
-                };
-                badge.textContent = categoryNames[category] || category.toUpperCase();
+function getMockNewsData(category) {
+    // Mock news data for different categories
+    const newsDatabase = {
+        general: [
+            { 
+                title: "Birmingham Announces Major Urban Regeneration Project", 
+                excerpt: "£500 million investment to transform city center with new green spaces and pedestrian zones.",
+                category: "Local News",
+                source: "Bham Post",
+                time: "1 hour ago",
+                icon: "city"
+            },
+            { 
+                title: "West Midlands Economy Shows Strong Growth", 
+                excerpt: "Latest figures reveal 3.2% GDP growth, outpacing national average for third consecutive quarter.",
+                category: "Business",
+                source: "Financial Times",
+                time: "2 hours ago",
+                icon: "chart-line"
+            },
+            { 
+                title: "New High-Speed Rail Link to London Gets Green Light", 
+                excerpt: "Government approves final stage of HS2 project, promising faster connections to the capital.",
+                category: "Transport",
+                source: "BBC Midlands",
+                time: "3 hours ago",
+                icon: "train"
+            },
+            { 
+                title: "Birmingham Libraries See Record Digital Usage", 
+                excerpt: "Local libraries report 40% increase in e-book loans as digital services expand across the city.",
+                category: "Education",
+                source: "Library News",
+                time: "4 hours ago",
+                icon: "book"
+            },
+            { 
+                title: "Major Music Festival Returns to Birmingham Parks", 
+                excerpt: "Annual summer festival expands to three locations with over 50 artists confirmed.",
+                category: "Entertainment",
+                source: "Culture Today",
+                time: "5 hours ago",
+                icon: "music"
+            },
+            { 
+                title: "Local Tech Hub Creates 500 New Jobs", 
+                excerpt: "Innovation district attracts major companies, boosting employment in digital sectors.",
+                category: "Technology",
+                source: "Tech Midlands",
+                time: "6 hours ago",
+                icon: "laptop-code"
+            },
+            { 
+                title: "New Recycling Initiative Launches Across West Midlands", 
+                excerpt: "Council introduces smart bins and increased collections to improve recycling rates.",
+                category: "Environment",
+                source: "Green Birmingham",
+                time: "7 hours ago",
+                icon: "recycle"
+            },
+            { 
+                title: "Historic Building Restoration Completed", 
+                excerpt: "19th century landmark reopens after £2 million conservation project.",
+                category: "Heritage",
+                source: "Heritage News",
+                time: "8 hours ago",
+                icon: "landmark"
+            },
+            { 
+                title: "Community Kitchen Feeds Hundreds Daily", 
+                excerpt: "Volunteer-run initiative provides meals for vulnerable residents across the city.",
+                category: "Community",
+                source: "Community Voice",
+                time: "9 hours ago",
+                icon: "utensils"
             }
+        ],
+        business: [
+            { 
+                title: "Local Bank Announces Expansion Plans", 
+                excerpt: "150 new jobs to be created as regional bank opens five new branches across West Midlands.",
+                category: "Finance",
+                source: "Business Daily",
+                time: "2 hours ago",
+                icon: "university"
+            },
+            { 
+                title: "Manufacturing Sector Reports Record Orders", 
+                excerpt: "Export demand drives growth in automotive and aerospace industries.",
+                category: "Manufacturing",
+                source: "Industry News",
+                time: "4 hours ago",
+                icon: "industry"
+            }
+        ],
+        sports: [
+            { 
+                title: "Birmingham City FC Secures Championship Promotion", 
+                excerpt: "Dramatic final match victory sends Blues to Premier League after decade-long absence.",
+                category: "Football",
+                source: "Sports Midlands",
+                time: "1 hour ago",
+                icon: "futbol"
+            },
+            { 
+                title: "Local Athlete Wins Gold at National Championships", 
+                excerpt: "Birmingham runner sets new personal best in 1500m event.",
+                category: "Athletics",
+                source: "Athletics Weekly",
+                time: "3 hours ago",
+                icon: "running"
+            }
+        ],
+        technology: [
+            { 
+                title: "Tech Startup Develops Revolutionary AI Tool", 
+                excerpt: "Local company's software can predict traffic patterns with 95% accuracy.",
+                category: "Artificial Intelligence",
+                source: "Tech Innovate",
+                time: "1 hour ago",
+                icon: "robot"
+            },
+            { 
+                title: "University Opens New Quantum Computing Lab", 
+                excerpt: "£10 million facility to position Birmingham as UK quantum research hub.",
+                category: "Quantum Computing",
+                source: "Science Today",
+                time: "5 hours ago",
+                icon: "atom"
+            }
+        ],
+        entertainment: [
+            { 
+                title: "Birmingham Symphony Orchestra Announces New Season", 
+                excerpt: "World premiere performances and international collaborations featured in upcoming program.",
+                category: "Music",
+                source: "Arts Review",
+                time: "2 hours ago",
+                icon: "guitar"
+            },
+            { 
+                title: "Major Film Production Coming to Birmingham", 
+                excerpt: "Hollywood studio to shoot period drama in historic Jewellery Quarter locations.",
+                category: "Film",
+                source: "Screen Daily",
+                time: "6 hours ago",
+                icon: "film"
+            }
+        ],
+        health: [
+            { 
+                title: "New Hospital Wing Opens Ahead of Schedule", 
+                excerpt: "State-of-the-art facilities to reduce waiting times and improve patient care.",
+                category: "Healthcare",
+                source: "Health Midlands",
+                time: "3 hours ago",
+                icon: "hospital"
+            },
+            { 
+                title: "Breakthrough in Local Medical Research", 
+                excerpt: "University team discovers promising new treatment for respiratory conditions.",
+                category: "Medical Research",
+                source: "Science Journal",
+                time: "7 hours ago",
+                icon: "microscope"
+            }
+        ],
+        science: [
+            { 
+                title: "Climate Research Center Makes Key Discovery", 
+                excerpt: "Birmingham scientists identify new method for carbon capture and storage.",
+                category: "Climate Science",
+                source: "Nature Research",
+                time: "4 hours ago",
+                icon: "cloud-sun"
+            },
+            { 
+                title: "Local University Launches Space Research Program", 
+                excerpt: "New initiative to study asteroid mining and lunar exploration technologies.",
+                category: "Space Research",
+                source: "Space News",
+                time: "8 hours ago",
+                icon: "satellite"
+            }
+        ]
+    };
+    
+    // Return news for current category, or general news if category not found
+    return newsDatabase[category] || newsDatabase.general;
+}
+
+function updateLastUpdateTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-GB', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false 
+    });
+    lastUpdate.textContent = `Updated: ${timeString}`;
+}
+
+// ============================================
+// SIDEBAR FUNCTIONALITY
+// ============================================
+
+function initSidebar() {
+    loadTrendingNews();
+    initNewsletter();
+}
+
+function loadTrendingNews() {
+    // Mock trending data
+    const trendingData = [
+        { rank: 1, title: "City Council Tax Changes Explained", views: "12.4K" },
+        { rank: 2, title: "Weekend Weather: What to Expect", views: "9.7K" },
+        { rank: 3, title: "Local Election Results Analysis", views: "8.2K" },
+        { rank: 4, title: "Best Independent Cafés in Birmingham", views: "7.5K" },
+        { rank: 5, title: "Transport Strikes: Alternative Routes", views: "6.9K" }
+    ];
+    
+    // Clear existing content
+    trendingList.innerHTML = '';
+    
+    // Generate trending items
+    trendingData.forEach(item => {
+        const trendingItem = document.createElement('div');
+        trendingItem.className = 'trending-item';
+        trendingItem.innerHTML = `
+            <div class="trending-rank">${item.rank}</div>
+            <div class="trending-content">
+                <h4>${item.title}</h4>
+                <div class="trending-stats">
+                    <span><i class="far fa-eye"></i> ${item.views} views</span>
+                </div>
+            </div>
+        `;
+        
+        // Add click event
+        trendingItem.addEventListener('click', () => {
+            alert(`Opening trending article: "${item.title}"`);
         });
+        
+        trendingList.appendChild(trendingItem);
     });
 }
 
-// ========== NOTIFICATION SYSTEM ==========
-function showNotification(message, type = 'info') {
+function initNewsletter() {
+    newsletterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const email = emailInput.value.trim();
+        
+        if (validateEmail(email)) {
+            // Simulate newsletter subscription
+            emailInput.value = '';
+            
+            // Show success message
+            showNotification('Thank you for subscribing to BhamPulse newsletter!');
+        } else {
+            // Show error message
+            emailInput.focus();
+            showNotification('Please enter a valid email address', 'error');
+        }
+    });
+}
+
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+// ============================================
+// QUICK LINKS
+// ============================================
+
+function initQuickLinks() {
+    weatherDetailsBtn.addEventListener('click', () => {
+        alert('Opening detailed weather forecast and alerts...');
+    });
+    
+    sportsHubBtn.addEventListener('click', () => {
+        alert('Navigating to Sports Hub with live scores and highlights...');
+    });
+    
+    localNewsBtn.addEventListener('click', () => {
+        alert('Loading Birmingham-specific local news...');
+    });
+    
+    businessNewsBtn.addEventListener('click', () => {
+        alert('Opening business section with market updates...');
+    });
+}
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+
+function showNotification(message, type = 'success') {
     // Create notification element
     const notification = document.createElement('div');
-    notification.className = `live-notification ${type}`;
+    notification.className = `notification ${type}`;
     notification.innerHTML = `
-        <i class="fas fa-${getNotificationIcon(type)}"></i>
-        <span>${message}</span>
-        <button onclick="this.parentElement.remove()">
-            <i class="fas fa-times"></i>
-        </button>
+        <div class="notification-content">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="notification-close"><i class="fas fa-times"></i></button>
     `;
+    
+    // Add styles if not already present
+    if (!document.querySelector('#notification-styles')) {
+        const style = document.createElement('style');
+        style.id = 'notification-styles';
+        style.textContent = `
+            .notification {
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: ${type === 'success' ? '#10b981' : '#ef4444'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                max-width: 350px;
+                font-size: 0.9rem;
+            }
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            .notification-content {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+            .notification-close {
+                background: transparent;
+                border: none;
+                color: white;
+                cursor: pointer;
+                font-size: 0.8rem;
+                opacity: 0.8;
+                transition: opacity 0.2s;
+            }
+            .notification-close:hover {
+                opacity: 1;
+            }
+        `;
+        document.head.appendChild(style);
+    }
     
     // Add to page
     document.body.appendChild(notification);
     
+    // Add close functionality
+    const closeBtn = notification.querySelector('.notification-close');
+    closeBtn.addEventListener('click', () => {
+        notification.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    });
+    
     // Auto-remove after 5 seconds
     setTimeout(() => {
-        if (notification.parentElement) {
-            notification.remove();
+        if (notification.parentNode) {
+            notification.style.animation = 'slideOut 0.3s ease-out';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
         }
     }, 5000);
-}
-
-function getNotificationIcon(type) {
-    const icons = {
-        'success': 'check-circle',
-        'error': 'exclamation-circle',
-        'info': 'info-circle',
-        'warning': 'exclamation-triangle'
-    };
-    return icons[type] || 'info-circle';
-}
-
-// ========== ARTICLE MODAL ==========
-function openArticle(event, article) {
-    event.preventDefault();
     
-    // Create modal
-    const modal = document.createElement('div');
-    modal.className = 'article-modal';
-    modal.innerHTML = `
-        <div class="modal-overlay" onclick="this.parentElement.remove()"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>${article.title}</h2>
-                <button onclick="this.closest('.article-modal').remove()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <img src="${article.urlToImage}" alt="${article.title}" class="modal-image">
-                <div class="modal-meta">
-                    <span><i class="far fa-clock"></i> ${formatTimeAgo(article.publishedAt)}</span>
-                    <span><i class="fas fa-newspaper"></i> ${article.source.name}</span>
-                    <span><i class="fas fa-tag"></i> ${article.category || 'General'}</span>
-                </div>
-                <div class="modal-text">
-                    <p>${article.description}</p>
-                    ${article.content ? `<p>${article.content}</p>` : ''}
-                </div>
-            </div>
-            <div class="modal-footer">
-                <a href="${article.url}" target="_blank" class="original-link">
-                    <i class="fas fa-external-link-alt"></i>
-                    Read Original Article
-                </a>
-                <button onclick="this.closest('.article-modal').remove()" class="close-btn">
-                    Close
-                </button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-}
-
-// ========== WEATHER FUNCTIONS ==========
-function updateWeather() {
-    // Simple weather update (can be enhanced with free weather API)
-    const tempElement = document.getElementById('currentTemp');
-    if (tempElement) {
-        const temps = [12, 13, 14, 15, 16, 17];
-        const randomTemp = temps[Math.floor(Math.random() * temps.length)];
-        tempElement.textContent = `${randomTemp}°C`;
-    }
-    
-    const timeElement = document.getElementById('weatherUpdateTime');
-    if (timeElement) {
-        const now = new Date();
-        timeElement.textContent = `Updated: ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+    // Add slideOut keyframes
+    if (!document.querySelector('#notification-animations')) {
+        const animations = document.createElement('style');
+        animations.id = 'notification-animations';
+        animations.textContent = `
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(animations);
     }
 }
 
-// Initialize weather updates
-setInterval(updateWeather, 10 * 60 * 1000); // Every 10 minutes
+// ============================================
+// ADDITIONAL ENHANCEMENTS
+// ============================================
 
-console.log('✅ BhamPulse LIVE News System Ready!');
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        
+        if (href !== '#' && href.length > 1) {
+            e.preventDefault();
+            const targetElement = document.querySelector(href);
+            
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 100,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    });
+});
+
+// Add active state to nav based on scroll position
+window.addEventListener('scroll', function() {
+    const sections = document.querySelectorAll('section[id]');
+    const scrollPosition = window.scrollY + 150;
+    
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.offsetHeight;
+        const sectionId = section.getAttribute('id');
+        
+        if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+            const correspondingNavLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
+            if (correspondingNavLink && !correspondingNavLink.classList.contains('active')) {
+                document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+                correspondingNavLink.classList.add('active');
+            }
+        }
+    });
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // Ctrl/Cmd + K for search focus
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInput.focus();
+    }
+    
+    // Escape to close mobile menu
+    if (e.key === 'Escape' && mainNav.classList.contains('active')) {
+        mainNav.classList.remove('active');
+        menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+    }
+});
+
+// Add loading animation for images
+document.addEventListener('DOMContentLoaded', function() {
+    const cardImages = document.querySelectorAll('.card-image i');
+    cardImages.forEach(icon => {
+        // Add subtle animation
+        icon.style.transition = 'all 0.3s ease';
+        
+        // Add hover effect
+        const parentCard = icon.closest('.news-card');
+        if (parentCard) {
+            parentCard.addEventListener('mouseenter', () => {
+                icon.style.transform = 'scale(1.1) rotate(5deg)';
+            });
+            
+            parentCard.addEventListener('mouseleave', () => {
+                icon.style.transform = 'scale(1) rotate(0)';
+            });
+        }
+    });
+});
+
+// Initialize weather with random variations for realism
+function randomizeWeather() {
+    // Random temperature between 10-18°C
+    const temp = Math.floor(Math.random() * 9) + 10;
+    currentTemp.textContent = `${temp}°C`;
+    feelsLike.textContent = `${temp - 1}°C`;
+    
+    // Random wind speed between 8-20 km/h
+    const wind = Math.floor(Math.random() * 13) + 8;
+    windSpeed.textContent = `${wind} km/h`;
+    
+    // Random humidity between 60-80%
+    const humid = Math.floor(Math.random() * 21) + 60;
+    humidity.textContent = `${humid}%`;
+}
+
+// Update weather every hour for realism
+setInterval(randomizeWeather, 60 * 60 * 1000);
+
+// Initialize with random weather
+setTimeout(randomizeWeather, 1000);
+
+console.log('BhamPulse News Hub successfully loaded!');
