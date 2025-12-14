@@ -1,11 +1,11 @@
 // ============================================
-// GNEWS API CONFIGURATION
+// GNEWS API CONFIGURATION WITH PROXY SOLUTION
 // ============================================
-// YOUR GNEWS API KEY
+// YOUR GNEWS API KEY (CORS issue solved with proxy)
 const GNEWS_API_KEY = '1e47bc83a36a8ce6533d130d44485754';
 const GNEWS_API_URL = 'https://gnews.io/api/v4/top-headlines';
-const GNEWS_API_COUNTRY = 'gb'; // 'gb' for United Kingdom
-const GNEWS_API_LANG = 'en';    // 'en' for English
+// Proxy service to solve CORS issue for vercel.app domain
+const CORS_PROXY_URL = 'https://api.allorigins.win/raw?url=';
 
 // Current settings
 let currentCategory = 'general';
@@ -35,7 +35,7 @@ const mainNav = document.getElementById('mainNav');
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('BhamPulse - Initialized with GNews API');
+    console.log('BhamPulse - Initialized with GNews API + Proxy');
     
     // Initialize all components
     initNavigation();
@@ -212,7 +212,7 @@ function formatCategoryName(category) {
 }
 
 // ============================================
-// 4. GNEWS API FUNCTIONS
+// 4. GNEWS API FUNCTIONS WITH PROXY SOLUTION
 // ============================================
 
 async function fetchNews(category = 'general', page = 1) {
@@ -235,19 +235,22 @@ async function fetchNews(category = 'general', page = 1) {
         const gnewsCategory = gnewsCategoryMap[category] || 'general';
         
         // Build GNews API URL
-        let url = `${GNEWS_API_URL}?token=${GNEWS_API_KEY}&lang=${GNEWS_API_LANG}&country=${GNEWS_API_COUNTRY}&category=${gnewsCategory}&max=${articlesPerPage}`;
+        const gnewsUrl = `${GNEWS_API_URL}?token=${GNEWS_API_KEY}&lang=en&country=gb&category=${gnewsCategory}&max=${articlesPerPage}`;
         
-        // Add page parameter (GNews uses 'page' for pagination)
-        if (page > 1) {
-            url += `&page=${page}`;
-        }
+        // Use CORS proxy to avoid CORS error
+        const proxyUrl = `${CORS_PROXY_URL}${encodeURIComponent(gnewsUrl)}`;
         
-        console.log('Fetching from GNews:', url.replace(GNEWS_API_KEY, 'HIDDEN_KEY'));
+        console.log('Fetching via proxy:', proxyUrl);
         
-        const response = await fetch(url);
+        const response = await fetch(proxyUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         
         if (!response.ok) {
-            throw new Error(`GNews API Error: ${response.status}`);
+            throw new Error(`Proxy/GNews API Error: ${response.status}`);
         }
         
         const data = await response.json();
@@ -266,7 +269,7 @@ async function fetchNews(category = 'general', page = 1) {
                 updateArticleCount(data.totalArticles || data.articles.length);
             }
             
-            showNotification(`Loaded ${articles.length} ${category} articles`, 'success');
+            showNotification(`Loaded ${articles.length} ${category} articles from GNews`, 'success');
             
         } else {
             // No articles found, use mock data
@@ -367,10 +370,10 @@ function createNewsCard(article) {
     const card = document.createElement('div');
     card.className = 'news-card';
     
-    // FIXED: Handle image properly - use placeholder if no image
+    // Handle image properly - use placeholder if no image
     let imageContent;
-    if (article.imageUrl) {
-        imageContent = `<img src="${article.imageUrl}" alt="${article.title}" class="card-image-real" onerror="this.onerror=null; this.src=''; this.className='card-image'; this.innerHTML='<i class=\'fas fa-${article.icon}\'></i>'">`;
+    if (article.imageUrl && article.imageUrl.trim() !== '') {
+        imageContent = `<img src="${article.imageUrl}" alt="${article.title}" class="card-image-real" onerror="handleImageError(this, '${article.icon}')">`;
     } else {
         // Use icon if no image
         imageContent = `<div class="card-image"><i class="fas fa-${article.icon}"></i></div>`;
@@ -389,26 +392,37 @@ function createNewsCard(article) {
         </div>
     `;
     
-    // FIXED: Make entire card clickable to open article
+    // Make entire card clickable to open article
     if (article.url && article.url !== '#') {
         card.style.cursor = 'pointer';
         card.addEventListener('click', function(e) {
-            // Don't open if user clicked on something interactive (future enhancement)
+            // Don't open if user clicked on something interactive
             if (e.target.tagName === 'A' || e.target.closest('a')) return;
             window.open(article.url, '_blank');
         });
         
         // Add hover effect
         card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
             this.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
         });
         
         card.addEventListener('mouseleave', function() {
+            this.style.transform = '';
             this.style.boxShadow = '';
         });
     }
     
     return card;
+}
+
+// Handle image loading errors
+function handleImageError(imgElement, iconName) {
+    imgElement.style.display = 'none';
+    const parent = imgElement.parentElement;
+    if (parent) {
+        parent.innerHTML = `<div class="card-image"><i class="fas fa-${iconName}"></i></div>`;
+    }
 }
 
 // ============================================
@@ -451,7 +465,7 @@ function showLoadingState() {
         newsContainer.innerHTML = `
             <div class="loading-state">
                 <i class="fas fa-spinner fa-spin"></i>
-                <p>Loading latest news...</p>
+                <p>Loading latest news from GNews...</p>
             </div>
         `;
     }
@@ -672,4 +686,4 @@ function showNotification(message, type = 'success') {
 // START THE APPLICATION
 // ============================================
 
-console.log('BhamPulse with GNews API - Script Loaded Successfully');
+console.log('BhamPulse with GNews API + Proxy - Script Loaded Successfully');
