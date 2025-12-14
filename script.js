@@ -2,7 +2,7 @@
 // NEWS API CONFIGURATION
 // ============================================
 // YOUR API KEY IS ALREADY INTEGRATED HERE
-const NEWS_API_KEY = '42f83001556744239dd1da740e2dc865';
+const NEWS_API_KEY = '1e47bc83a36a8ce6533d130d44485754';
 const NEWS_API_URL = 'https://newsapi.org/v2/top-headlines';
 
 // Current settings
