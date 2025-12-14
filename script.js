@@ -1,9 +1,11 @@
 // ============================================
-// NEWS API CONFIGURATION
+// GNEWS API CONFIGURATION
 // ============================================
-// YOUR API KEY IS ALREADY INTEGRATED HERE
-const NEWS_API_KEY = '1e47bc83a36a8ce6533d130d44485754';
-const NEWS_API_URL = 'https://newsapi.org/v2/top-headlines';
+// YOUR GNEWS API KEY
+const GNEWS_API_KEY = '1e47bc83a36a8ce6533d130d44485754';
+const GNEWS_API_URL = 'https://gnews.io/api/v4/top-headlines';
+const GNEWS_API_COUNTRY = 'gb'; // 'gb' for United Kingdom
+const GNEWS_API_LANG = 'en';    // 'en' for English
 
 // Current settings
 let currentCategory = 'general';
@@ -33,7 +35,7 @@ const mainNav = document.getElementById('mainNav');
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('BhamPulse - Fixed & Ready');
+    console.log('BhamPulse - Initialized with GNews API');
     
     // Initialize all components
     initNavigation();
@@ -45,11 +47,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set initial update time
     updateLastUpdateTime();
     
-    // Auto-refresh news every 5 minutes
+    // Auto-refresh news every 5 minutes (300000 milliseconds)
     setInterval(() => {
         refreshNews();
         updateBBCWeatherTime();
-    }, 5 * 60 * 1000);
+    }, 300000);
 });
 
 // ============================================
@@ -58,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function initNavigation() {
     // Mobile Menu Toggle
-    if (menuToggle) {
+    if (menuToggle && mainNav) {
         menuToggle.addEventListener('click', function() {
             mainNav.classList.toggle('active');
             this.innerHTML = mainNav.classList.contains('active') 
@@ -67,21 +69,30 @@ function initNavigation() {
         });
     }
     
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', function(event) {
-        if (menuToggle && !menuToggle.contains(event.target) && mainNav && !mainNav.contains(event.target)) {
-            mainNav.classList.remove('active');
-            if (menuToggle) menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
-        }
-    });
-    
-    // Navigation active state
+    // Navigation active state - FIXED FOR HEADER NAV
     const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
+            // Update active class
             navLinks.forEach(l => l.classList.remove('active'));
             this.classList.add('active');
+            
+            // Get category from data attribute
+            const targetCategory = this.getAttribute('data-category');
+            if (targetCategory && targetCategory !== currentCategory) {
+                // Update current category
+                currentCategory = targetCategory;
+                currentPage = 1;
+                
+                // Update category badge in news section if it exists
+                if (currentCategoryBadge) {
+                    currentCategoryBadge.textContent = formatCategoryName(currentCategory);
+                }
+                
+                // Load news for the new category
+                fetchNews(currentCategory, currentPage);
+            }
             
             // Close mobile menu after selection
             if (mainNav) mainNav.classList.remove('active');
@@ -102,7 +113,7 @@ function performSearch() {
     if (searchInput) {
         const query = searchInput.value.trim();
         if (query) {
-            alert(`Searching for: "${query}"\n\nIn a real application, this would fetch search results from a news API.`);
+            alert(`Searching for: "${query}"\n\nIn a real application, this would fetch search results from GNews API.`);
             searchInput.value = '';
         } else {
             searchInput.focus();
@@ -154,7 +165,7 @@ function randomizeBBCWeather() {
 }
 
 // ============================================
-// 3. CATEGORY TABS FUNCTIONS
+// 3. CATEGORY TABS FUNCTIONS (MAIN SECTION)
 // ============================================
 
 function initCategoryTabs() {
@@ -178,69 +189,88 @@ function initCategoryTabs() {
                 }
                 
                 // Load news for new category
-                fetchRealNews(currentCategory, currentPage);
+                fetchNews(currentCategory, currentPage);
             }
         });
     });
 }
 
 function formatCategoryName(category) {
-    return category === 'general' ? 'Top Stories' : 
-           category.charAt(0).toUpperCase() + category.slice(1);
+    // Map API categories to display names
+    const categoryMap = {
+        'general': 'Top Stories',
+        'business': 'Business',
+        'sports': 'Sports',
+        'technology': 'Technology',
+        'entertainment': 'Entertainment',
+        'health': 'Health',
+        'science': 'Science',
+        'local': 'Local',
+        'world': 'World'
+    };
+    return categoryMap[category] || category.charAt(0).toUpperCase() + category.slice(1);
 }
 
 // ============================================
-// 4. NEWS API FUNCTIONS (WITH FALLBACK)
+// 4. GNEWS API FUNCTIONS
 // ============================================
 
-async function fetchRealNews(category = 'general', page = 1) {
+async function fetchNews(category = 'general', page = 1) {
     showLoadingState();
     
-    // TRY REAL API FIRST
     try {
-        const params = {
-            country: 'gb',
-            category: category === 'general' ? '' : category,
-            page: page,
-            pageSize: articlesPerPage,
-            apiKey: NEWS_API_KEY
+        // Map our category names to GNews categories
+        const gnewsCategoryMap = {
+            'general': 'general',
+            'business': 'business',
+            'sports': 'sports',
+            'technology': 'technology',
+            'entertainment': 'entertainment',
+            'health': 'health',
+            'science': 'science',
+            'local': 'general', // GNews doesn't have 'local', use 'general'
+            'world': 'world'
         };
         
-        Object.keys(params).forEach(key => {
-            if (params[key] === '') delete params[key];
-        });
+        const gnewsCategory = gnewsCategoryMap[category] || 'general';
         
-        const queryString = new URLSearchParams(params).toString();
-        const url = `${NEWS_API_URL}?${queryString}`;
+        // Build GNews API URL
+        let url = `${GNEWS_API_URL}?token=${GNEWS_API_KEY}&lang=${GNEWS_API_LANG}&country=${GNEWS_API_COUNTRY}&category=${gnewsCategory}&max=${articlesPerPage}`;
+        
+        // Add page parameter (GNews uses 'page' for pagination)
+        if (page > 1) {
+            url += `&page=${page}`;
+        }
+        
+        console.log('Fetching from GNews:', url.replace(GNEWS_API_KEY, 'HIDDEN_KEY'));
         
         const response = await fetch(url);
         
         if (!response.ok) {
-            // If API returns error (like 426), throw to use mock data
-            throw new Error(`API Error: ${response.status}`);
+            throw new Error(`GNews API Error: ${response.status}`);
         }
         
         const data = await response.json();
         
         if (data.articles && data.articles.length > 0) {
-            const articles = transformApiData(data.articles, category);
+            const articles = transformGNewsData(data.articles, category);
             displayNewsArticles(articles, page);
             
             // Update breaking news with first article
             if (bbcBreakingText && data.articles[0].title) {
-                bbcBreakingText.textContent = data.articles[0].title.substring(0, 80) + '...';
+                bbcBreakingText.textContent = data.articles[0].title.substring(0, 80) + (data.articles[0].title.length > 80 ? '...' : '');
             }
             
             // Update article count
-            if (liveArticleCount && data.totalResults) {
-                updateArticleCount(data.totalResults);
+            if (liveArticleCount) {
+                updateArticleCount(data.totalArticles || data.articles.length);
             }
             
-            showNotification('Live news loaded successfully!', 'success');
+            showNotification(`Loaded ${articles.length} ${category} articles`, 'success');
             
         } else {
-            // API returned empty, use mock data
-            console.log('API returned no articles, using sample data');
+            // No articles found, use mock data
+            console.log('GNews returned no articles, using sample data');
             const mockArticles = getMockNewsData(category);
             displayNewsArticles(mockArticles, page);
             showNotification('Showing sample news articles', 'info');
@@ -249,8 +279,8 @@ async function fetchRealNews(category = 'general', page = 1) {
         updateLastUpdateTime();
         
     } catch (error) {
-        // FALLBACK TO MOCK DATA IF API FAILS
-        console.log('API failed, using smart mock data:', error.message);
+        // Fallback to mock data if API fails
+        console.log('GNews API failed, using smart mock data:', error.message);
         const mockArticles = getMockNewsData(category);
         displayNewsArticles(mockArticles, page);
         
@@ -261,8 +291,9 @@ async function fetchRealNews(category = 'general', page = 1) {
     }
 }
 
-function transformApiData(apiArticles, category) {
-    return apiArticles.map((article) => {
+function transformGNewsData(gnewsArticles, category) {
+    return gnewsArticles.map((article) => {
+        // Determine icon based on category
         const iconMap = {
             'business': 'chart-line',
             'sports': 'futbol',
@@ -270,35 +301,50 @@ function transformApiData(apiArticles, category) {
             'entertainment': 'film',
             'health': 'heartbeat',
             'science': 'flask',
-            'general': 'newspaper'
+            'general': 'newspaper',
+            'local': 'map-marker-alt',
+            'world': 'globe'
         };
+        
+        // Format time
+        let timeAgo = 'Recently';
+        if (article.publishedAt) {
+            timeAgo = formatTimeAgo(article.publishedAt);
+        }
         
         return {
             title: article.title || 'No title available',
-            excerpt: article.description || 'Click to read more...',
+            excerpt: article.description || 'Click to read full article...',
             category: formatCategoryName(category),
             source: article.source?.name || 'Unknown Source',
-            time: formatTimeAgo(article.publishedAt),
+            time: timeAgo,
             icon: iconMap[category] || 'newspaper',
-            url: article.url,
-            imageUrl: article.urlToImage
+            url: article.url || '#',
+            imageUrl: article.image || article.urlToImage
         };
     });
 }
 
 // ============================================
-// 5. NEWS DISPLAY FUNCTIONS
+// 5. NEWS DISPLAY FUNCTIONS (FIXED CLICK & IMAGE)
 // ============================================
 
 function displayNewsArticles(articles, page) {
+    // Clear container if first page
     if (page === 1 && newsContainer) {
         newsContainer.innerHTML = '';
     }
     
+    // Show/hide load more button
     if (loadMoreBtn) {
-        loadMoreBtn.style.display = articles.length < articlesPerPage ? 'none' : 'flex';
+        if (articles.length >= articlesPerPage) {
+            loadMoreBtn.style.display = 'flex';
+        } else {
+            loadMoreBtn.style.display = 'none';
+        }
     }
     
+    // If no articles found
     if (articles.length === 0 && page === 1 && newsContainer) {
         newsContainer.innerHTML = `
             <div class="no-articles">
@@ -310,6 +356,7 @@ function displayNewsArticles(articles, page) {
         return;
     }
     
+    // Display articles
     articles.forEach(article => {
         const newsCard = createNewsCard(article);
         if (newsContainer) newsContainer.appendChild(newsCard);
@@ -320,9 +367,14 @@ function createNewsCard(article) {
     const card = document.createElement('div');
     card.className = 'news-card';
     
-    const imageContent = article.imageUrl 
-        ? `<img src="${article.imageUrl}" alt="${article.title}" class="card-image-real" onerror="this.onerror=null; this.style.display='none'; this.parentElement.innerHTML='<div class=\'card-image\'><i class=\'fas fa-${article.icon}\'></i></div>';">`
-        : `<div class="card-image"><i class="fas fa-${article.icon}"></i></div>`;
+    // FIXED: Handle image properly - use placeholder if no image
+    let imageContent;
+    if (article.imageUrl) {
+        imageContent = `<img src="${article.imageUrl}" alt="${article.title}" class="card-image-real" onerror="this.onerror=null; this.src=''; this.className='card-image'; this.innerHTML='<i class=\'fas fa-${article.icon}\'></i>'">`;
+    } else {
+        // Use icon if no image
+        imageContent = `<div class="card-image"><i class="fas fa-${article.icon}"></i></div>`;
+    }
     
     card.innerHTML = `
         ${imageContent}
@@ -337,10 +389,22 @@ function createNewsCard(article) {
         </div>
     `;
     
-    if (article.url) {
+    // FIXED: Make entire card clickable to open article
+    if (article.url && article.url !== '#') {
         card.style.cursor = 'pointer';
-        card.addEventListener('click', () => {
+        card.addEventListener('click', function(e) {
+            // Don't open if user clicked on something interactive (future enhancement)
+            if (e.target.tagName === 'A' || e.target.closest('a')) return;
             window.open(article.url, '_blank');
+        });
+        
+        // Add hover effect
+        card.addEventListener('mouseenter', function() {
+            this.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.boxShadow = '';
         });
     }
     
@@ -354,15 +418,23 @@ function createNewsCard(article) {
 function formatTimeAgo(publishedAt) {
     if (!publishedAt) return 'Recently';
     
-    const published = new Date(publishedAt);
-    const now = new Date();
-    const diffInHours = Math.floor((now - published) / (1000 * 60 * 60));
-    
-    if (diffInHours < 1) return 'Just now';
-    else if (diffInHours < 24) return `${diffInHours}h ago`;
-    else {
-        const diffInDays = Math.floor(diffInHours / 24);
-        return `${diffInDays}d ago`;
+    try {
+        const published = new Date(publishedAt);
+        const now = new Date();
+        const diffInMs = now - published;
+        const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+        
+        if (diffInHours < 1) {
+            const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+            return `${diffInMinutes}m ago`;
+        } else if (diffInHours < 24) {
+            return `${diffInHours}h ago`;
+        } else {
+            const diffInDays = Math.floor(diffInHours / 24);
+            return `${diffInDays}d ago`;
+        }
+    } catch (e) {
+        return 'Recently';
     }
 }
 
@@ -401,7 +473,7 @@ function updateLastUpdateTime() {
 
 function initNews() {
     // Load initial news
-    fetchRealNews(currentCategory, currentPage);
+    fetchNews(currentCategory, currentPage);
     
     // Refresh button
     if (refreshBtn) {
@@ -420,7 +492,7 @@ function refreshNews() {
     }
     
     currentPage = 1;
-    fetchRealNews(currentCategory, currentPage);
+    fetchNews(currentCategory, currentPage);
     
     setTimeout(() => {
         if (refreshBtn) refreshBtn.innerHTML = '<i class="fas fa-redo"></i> Refresh News';
@@ -429,7 +501,7 @@ function refreshNews() {
 
 function loadMoreNews() {
     currentPage++;
-    fetchRealNews(currentCategory, currentPage);
+    fetchNews(currentCategory, currentPage);
 }
 
 // ============================================
@@ -446,7 +518,8 @@ function getMockNewsData(category) {
                 source: "Birmingham Post",
                 time: "1 hour ago",
                 icon: "city",
-                url: "https://example.com/news/1"
+                url: "https://example.com/news/1",
+                imageUrl: "https://images.unsplash.com/photo-1515586838455-8f8f940d6853?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
             },
             { 
                 title: "West Midlands Economy Grows 3.2%, Outpacing National Average", 
@@ -455,43 +528,8 @@ function getMockNewsData(category) {
                 source: "Financial Times",
                 time: "2 hours ago",
                 icon: "chart-line",
-                url: "https://example.com/news/2"
-            },
-            { 
-                title: "HS2 High-Speed Rail: Final Stage Approved for London-Birmingham Link", 
-                excerpt: "Government gives green light to complete HS2 project, promising faster connections.",
-                category: "Transport",
-                source: "BBC Midlands",
-                time: "3 hours ago",
-                icon: "train",
-                url: "https://example.com/news/3"
-            },
-            { 
-                title: "Birmingham Libraries Report 40% Surge in Digital Book Loans", 
-                excerpt: "E-book usage skyrockets as digital services expand across city libraries.",
-                category: "Education",
-                source: "Library News",
-                time: "4 hours ago",
-                icon: "book",
-                url: "https://example.com/news/4"
-            },
-            { 
-                title: "Summer Music Festival Returns to Birmingham with 50+ Artists", 
-                excerpt: "Annual festival expands to three park locations across the city this summer.",
-                category: "Entertainment",
-                source: "Culture Today",
-                time: "5 hours ago",
-                icon: "music",
-                url: "https://example.com/news/5"
-            },
-            { 
-                title: "Tech Hub Creates 500 New Jobs in Birmingham Innovation District", 
-                excerpt: "Major companies move to Birmingham's tech district, boosting employment.",
-                category: "Technology",
-                source: "Tech Midlands",
-                time: "6 hours ago",
-                icon: "laptop-code",
-                url: "https://example.com/news/6"
+                url: "https://example.com/news/2",
+                imageUrl: "https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
             }
         ],
         technology: [
@@ -502,25 +540,8 @@ function getMockNewsData(category) {
                 source: "Tech Innovate",
                 time: "1 hour ago",
                 icon: "robot",
-                url: "https://example.com/tech/1"
-            },
-            { 
-                title: "University Opens £10M Quantum Computing Lab in Birmingham", 
-                excerpt: "New facility positions Birmingham as UK's quantum research hub.",
-                category: "Quantum Computing",
-                source: "Science Today",
-                time: "5 hours ago",
-                icon: "atom",
-                url: "https://example.com/tech/2"
-            },
-            { 
-                title: "Local Tech Firms Secure £20M in Funding for Green Tech", 
-                excerpt: "Birmingham startups developing sustainable technology attract major investment.",
-                category: "Green Tech",
-                source: "Eco Business",
-                time: "7 hours ago",
-                icon: "leaf",
-                url: "https://example.com/tech/3"
+                url: "https://example.com/tech/1",
+                imageUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
             }
         ],
         sports: [
@@ -531,36 +552,20 @@ function getMockNewsData(category) {
                 source: "Sports Midlands",
                 time: "1 hour ago",
                 icon: "futbol",
-                url: "https://example.com/sports/1"
-            },
-            { 
-                title: "Local Athlete Wins Gold at National Athletics Championships", 
-                excerpt: "Birmingham runner sets new personal best in 1500m event in Manchester.",
-                category: "Athletics",
-                source: "Athletics Weekly",
-                time: "3 hours ago",
-                icon: "running",
-                url: "https://example.com/sports/2"
+                url: "https://example.com/sports/1",
+                imageUrl: "https://images.unsplash.com/photo-1551958219-acbc608c6377?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
             }
         ],
-        business: [
+        local: [
             { 
-                title: "Regional Bank Announces Expansion: 150 New Jobs in West Midlands", 
-                excerpt: "Five new branches to open across region as local bank expands services.",
-                category: "Finance",
-                source: "Business Daily",
-                time: "2 hours ago",
-                icon: "university",
-                url: "https://example.com/business/1"
-            },
-            { 
-                title: "Manufacturing Sector Reports Record Export Orders", 
-                excerpt: "Automotive and aerospace industries see surge in international demand.",
-                category: "Manufacturing",
-                source: "Industry News",
-                time: "4 hours ago",
-                icon: "industry",
-                url: "https://example.com/business/2"
+                title: "New Community Center Opens in Birmingham's Jewellery Quarter", 
+                excerpt: "Facility will offer free workshops and events for local residents.",
+                category: "Community",
+                source: "Birmingham Mail",
+                time: "3 hours ago",
+                icon: "map-marker-alt",
+                url: "https://example.com/local/1",
+                imageUrl: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
             }
         ]
     };
@@ -569,7 +574,7 @@ function getMockNewsData(category) {
 }
 
 // ============================================
-// 9. NOTIFICATION SYSTEM (MISSING FUNCTION ADDED)
+// 9. NOTIFICATION SYSTEM
 // ============================================
 
 function showNotification(message, type = 'success') {
@@ -667,4 +672,4 @@ function showNotification(message, type = 'success') {
 // START THE APPLICATION
 // ============================================
 
-console.log('BhamPulse Script Loaded Successfully');
+console.log('BhamPulse with GNews API - Script Loaded Successfully');
