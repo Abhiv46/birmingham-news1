@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initBBCWeather();
     initCategoryTabs();
     initNews();
+    initQuickLinks(); // NEW: Initialize Quick Access links
     
     // Set initial update time
     updateLastUpdateTime();
@@ -625,7 +626,181 @@ function getMockNewsData(category) {
 }
 
 // ============================================
-// 9. NOTIFICATION SYSTEM
+// 9. QUICK ACCESS LINKS FUNCTIONS (ADDED)
+// ============================================
+
+function initQuickLinks() {
+    // Weather Details Button
+    const weatherDetailsBtn = document.getElementById('weatherDetailsBtn');
+    if (weatherDetailsBtn) {
+        weatherDetailsBtn.addEventListener('click', function() {
+            showNotification('Opening detailed weather forecast...', 'info');
+            // In a real app, this would navigate to a weather page
+            setTimeout(() => {
+                alert('Weather Details Page\n\nThis would show detailed forecast, radar, and alerts for Birmingham.');
+            }, 300);
+        });
+    }
+    
+    // Sports Hub Button
+    const sportsHubBtn = document.getElementById('sportsHubBtn');
+    if (sportsHubBtn) {
+        sportsHubBtn.addEventListener('click', function() {
+            // Change category to Sports
+            if (currentCategory !== 'sports') {
+                currentCategory = 'sports';
+                currentPage = 1;
+                
+                // Update UI elements
+                if (currentCategoryBadge) {
+                    currentCategoryBadge.textContent = 'Sports';
+                }
+                
+                // Update active states
+                const allTabBtns = document.querySelectorAll('.tab-btn');
+                allTabBtns.forEach(tab => {
+                    if(tab.getAttribute('data-category') === 'sports') {
+                        tab.classList.add('active');
+                    } else {
+                        tab.classList.remove('active');
+                    }
+                });
+                
+                const navLinks = document.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    const linkCategory = link.getAttribute('data-category');
+                    if(linkCategory === 'sports') {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+                
+                // Load sports news
+                fetchNews('sports', 1);
+                showNotification('Loading latest sports news...', 'info');
+                
+                // Scroll to news section
+                const newsSection = document.querySelector('.news-section');
+                if (newsSection) {
+                    window.scrollTo({
+                        top: newsSection.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            } else {
+                showNotification('Already showing Sports news', 'info');
+            }
+        });
+    }
+    
+    // Local News Button
+    const localNewsBtn = document.getElementById('localNewsBtn');
+    if (localNewsBtn) {
+        localNewsBtn.addEventListener('click', function() {
+            // Change category to Local
+            if (currentCategory !== 'local') {
+                currentCategory = 'local';
+                currentPage = 1;
+                
+                // Update UI elements
+                if (currentCategoryBadge) {
+                    currentCategoryBadge.textContent = 'Local';
+                }
+                
+                // Update active states
+                const allTabBtns = document.querySelectorAll('.tab-btn');
+                allTabBtns.forEach(tab => {
+                    if(tab.getAttribute('data-category') === 'local') {
+                        tab.classList.add('active');
+                    } else {
+                        tab.classList.remove('active');
+                    }
+                });
+                
+                const navLinks = document.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    const linkCategory = link.getAttribute('data-category');
+                    if(linkCategory === 'local') {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+                
+                // Load local news (will use general category from GNews as fallback)
+                fetchNews('local', 1);
+                showNotification('Loading Birmingham local news...', 'info');
+                
+                // Scroll to news section
+                const newsSection = document.querySelector('.news-section');
+                if (newsSection) {
+                    window.scrollTo({
+                        top: newsSection.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            } else {
+                showNotification('Already showing Local news', 'info');
+            }
+        });
+    }
+    
+    // Business News Button
+    const businessNewsBtn = document.getElementById('businessNewsBtn');
+    if (businessNewsBtn) {
+        businessNewsBtn.addEventListener('click', function() {
+            // Change category to Business
+            if (currentCategory !== 'business') {
+                currentCategory = 'business';
+                currentPage = 1;
+                
+                // Update UI elements
+                if (currentCategoryBadge) {
+                    currentCategoryBadge.textContent = 'Business';
+                }
+                
+                // Update active states
+                const allTabBtns = document.querySelectorAll('.tab-btn');
+                allTabBtns.forEach(tab => {
+                    if(tab.getAttribute('data-category') === 'business') {
+                        tab.classList.add('active');
+                    } else {
+                        tab.classList.remove('active');
+                    }
+                });
+                
+                const navLinks = document.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    const linkCategory = link.getAttribute('data-category');
+                    if(linkCategory === 'business') {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+                
+                // Load business news
+                fetchNews('business', 1);
+                showNotification('Loading latest business news...', 'info');
+                
+                // Scroll to news section
+                const newsSection = document.querySelector('.news-section');
+                if (newsSection) {
+                    window.scrollTo({
+                        top: newsSection.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            } else {
+                showNotification('Already showing Business news', 'info');
+            }
+        });
+    }
+}
+
+// ============================================
+// 10. NOTIFICATION SYSTEM
 // ============================================
 
 function showNotification(message, type = 'success') {
@@ -723,4 +898,4 @@ function showNotification(message, type = 'success') {
 // START THE APPLICATION
 // ============================================
 
-console.log('BhamPulse with GNews API + Proxy - Script Loaded Successfully');
+console.log('BhamPulse with GNews API + Proxy + Quick Links - Script Loaded Successfully');
