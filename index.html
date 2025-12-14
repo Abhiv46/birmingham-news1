@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bham Pulse | Birmingham's Premier News Source</title>
     <meta name="description" content="Breaking news, weather, sports and local updates from Birmingham and West Midlands">
-    
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
@@ -34,7 +32,7 @@
                 <span>LIVE UPDATES</span>
             </div>
             
-            <!-- Main Navigation - FIXED -->
+            <!-- Main Navigation -->
             <nav class="main-nav" id="mainNav">
                 <div class="nav-item">
                     <a href="#home" class="nav-link active" data-category="home">
@@ -113,110 +111,46 @@
 
     <!-- Main Content -->
     <main class="container">
-        <!-- Hero Section -->
-        <section class="hero-section" id="home">
-            <div class="hero-grid">
-                <!-- Main Hero Content -->
-                <div class="hero-content">
-                    <h1 class="hero-title">Birmingham's Premier News Source</h1>
-                    <p class="hero-subtitle">
-                        Real-time updates, in-depth analysis, and comprehensive coverage of Birmingham 
-                        and the West Midlands. Your trusted source for breaking news, weather, sports, 
-                        and local events.
-                    </p>
-                    
-                    <div class="hero-stats">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-newspaper"></i>
-                            </div>
-                            <div class="stat-content">
-                                <h3>Live Articles</h3>
-                                <p id="liveArticleCount">0</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="stat-content">
-                                <h3>Updated</h3>
-                                <p id="updateFrequency">Every 5 Min</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="stat-content">
-                                <h3>Active Readers</h3>
-                                <p id="readerCount">1.2K</p>
-                            </div>
-                        </div>
-                    </div>
+        <!-- NEW BBC-STYLE HERO SECTION -->
+        <section class="hero-section bbc-style-hero" id="home">
+            <div class="bbc-hero-content">
+                <div class="bbc-header">
+                    <h1 class="bbc-site-title">BhamPulse</h1>
+                    <p class="bbc-site-tagline">Your trusted source for Birmingham & West Midlands news</p>
                 </div>
                 
-                <!-- Weather Widget -->
-                <div class="weather-widget">
-                    <div class="weather-header">
-                        <h3>
-                            <i class="fas fa-map-marker-alt"></i>
-                            Birmingham
-                        </h3>
-                        <div class="location-info">
-                            <i class="fas fa-sync-alt"></i>
-                            <span id="weatherUpdateTime">Just now</span>
-                        </div>
+                <!-- Breaking News Box -->
+                <div class="bbc-breaking-box">
+                    <span class="bbc-breaking-label">
+                        <i class="fas fa-bolt"></i>
+                        BREAKING
+                    </span>
+                    <p class="bbc-breaking-text" id="bbcBreakingText">West Midlands announces new infrastructure investment plan</p>
+                </div>
+                
+                <!-- Compact Stats -->
+                <div class="bbc-compact-stats">
+                    <div class="bbc-stat-item">
+                        <span class="bbc-stat-number" id="liveArticleCount">--</span>
+                        <span class="bbc-stat-label">Live Articles</span>
                     </div>
-                    
-                    <div class="weather-main">
-                        <div class="current-temp" id="currentTemp">14°C</div>
-                        <div class="weather-condition" id="weatherCondition">Partly Cloudy</div>
-                        
-                        <div class="weather-details">
-                            <div class="detail-item">
-                                <div class="detail-icon">
-                                    <i class="fas fa-wind"></i>
-                                </div>
-                                <div class="detail-info">
-                                    <h4>Wind</h4>
-                                    <p id="windSpeed">12 km/h</p>
-                                </div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-icon">
-                                    <i class="fas fa-tint"></i>
-                                </div>
-                                <div class="detail-info">
-                                    <h4>Humidity</h4>
-                                    <p id="humidity">65%</p>
-                                </div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-icon">
-                                    <i class="fas fa-temperature-high"></i>
-                                </div>
-                                <div class="detail-info">
-                                    <h4>Feels Like</h4>
-                                    <p id="feelsLike">13°C</p>
-                                </div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-icon">
-                                    <i class="fas fa-eye"></i>
-                                </div>
-                                <div class="detail-info">
-                                    <h4>Visibility</h4>
-                                    <p id="visibility">10 km</p>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="bbc-stat-item">
+                        <span class="bbc-stat-number">24/7</span>
+                        <span class="bbc-stat-label">Updates</span>
                     </div>
-                    
-                    <div class="weather-forecast">
-                        <div class="forecast-title">3-Day Forecast</div>
-                        <div class="forecast-grid" id="forecastGrid">
-                            <!-- Forecast will be added by JavaScript -->
+                    <div class="bbc-stat-item">
+                        <span class="bbc-stat-number">Local</span>
+                        <span class="bbc-stat-label">Focus</span>
+                    </div>
+                    <!-- Compact Weather -->
+                    <div class="bbc-weather-compact">
+                        <div class="bbc-weather-header">
+                            <span><i class="fas fa-map-marker-alt"></i> Bham</span>
+                            <span class="bbc-weather-time" id="bbcWeatherTime">Now</span>
+                        </div>
+                        <div class="bbc-weather-main">
+                            <span class="bbc-weather-temp" id="bbcWeatherTemp">15°C</span>
+                            <span class="bbc-weather-condition" id="bbcWeatherCondition">Cloudy</span>
                         </div>
                     </div>
                 </div>
@@ -279,7 +213,7 @@
                     </div>
 
                     <div class="news-grid" id="newsContainer">
-                        <!-- News cards will be loaded here -->
+                        <!-- News cards will be loaded here by JavaScript -->
                         <div class="loading-state">
                             <i class="fas fa-spinner fa-spin"></i>
                             <p>Loading latest news...</p>
