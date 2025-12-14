@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================
-// 1. NAVIGATION & SEARCH FUNCTIONS
+// 1. NAVIGATION & SEARCH FUNCTIONS (UPDATED)
 // ============================================
 
 function initNavigation() {
@@ -69,29 +69,53 @@ function initNavigation() {
         });
     }
     
-    // Navigation active state - FIXED FOR HEADER NAV
+    // Navigation active state - UPDATED TO CHANGE NEWS CATEGORY
     const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
+            
             // Update active class
             navLinks.forEach(l => l.classList.remove('active'));
             this.classList.add('active');
             
             // Get category from data attribute
             const targetCategory = this.getAttribute('data-category');
-            if (targetCategory && targetCategory !== currentCategory) {
+            
+            // IMPORTANT: Map 'home' to 'general' for GNews API
+            const newsCategory = (targetCategory === 'home') ? 'general' : targetCategory;
+            
+            if (newsCategory && newsCategory !== currentCategory) {
                 // Update current category
-                currentCategory = targetCategory;
+                currentCategory = newsCategory;
                 currentPage = 1;
                 
-                // Update category badge in news section if it exists
+                // Also update the active tab in the main category tabs
+                const allTabBtns = document.querySelectorAll('.tab-btn');
+                allTabBtns.forEach(tab => {
+                    if(tab.getAttribute('data-category') === newsCategory) {
+                        tab.classList.add('active');
+                    } else {
+                        tab.classList.remove('active');
+                    }
+                });
+                
+                // Update category badge in news section
                 if (currentCategoryBadge) {
                     currentCategoryBadge.textContent = formatCategoryName(currentCategory);
                 }
                 
                 // Load news for the new category
                 fetchNews(currentCategory, currentPage);
+                
+                // Smooth scroll to the news section for better UX
+                const newsSection = document.querySelector('.news-section');
+                if (newsSection) {
+                    window.scrollTo({
+                        top: newsSection.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
             }
             
             // Close mobile menu after selection
@@ -187,6 +211,19 @@ function initCategoryTabs() {
                 if (currentCategoryBadge) {
                     currentCategoryBadge.textContent = formatCategoryName(newCategory);
                 }
+                
+                // Also update the active nav link in header
+                const navLinks = document.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    const linkCategory = link.getAttribute('data-category');
+                    const mappedCategory = (linkCategory === 'home') ? 'general' : linkCategory;
+                    
+                    if(mappedCategory === newCategory) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
                 
                 // Load news for new category
                 fetchNews(currentCategory, currentPage);
